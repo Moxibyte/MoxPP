@@ -1,6 +1,8 @@
-MIT License
+"""
+Automatic generation script
+Will completely setup, build and deploy your project
 
-Copyright (c) 2023 Moxibyte GmbH i. Gr.
+Copyright (c) 2023 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +21,21 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+"""
+import sys
+import subprocess
+
+if __name__ == '__main__':
+    # Configuration
+    conf = 'Release'
+    if len(sys.argv) > 1:
+        conf = sys.argv[1]
+
+    # Init project
+    subprocess.run((sys.executable, './scripts/mox.py', 'init'))
+
+    # Build project
+    subprocess.run((sys.executable, './scripts/mox.py', 'build', conf))
+
+    # Deploy project
+    subprocess.run((sys.executable, './scripts/mox.py', 'deploy', conf))

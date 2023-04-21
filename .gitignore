@@ -1,0 +1,17 @@
+# Python caches
+**__pycache__**
+
+# Dependency output
+/dependencies
+
+# Build Output
+/build
+/temp
+/deploy
+
+# Visual Studio
+/.vs
+**.sln
+**.vcxproj
+**.vcxproj.user
+**.vcxproj.filters
