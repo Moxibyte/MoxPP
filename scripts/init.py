@@ -46,11 +46,11 @@ def GetPremakeGenerator():
         return f'vs{vsversion}'
 
 def GetPremakeDownloadUrl(version):
-    baseUrl = f'https://github.com/premake/premake-core/releases/download/v{version}/premake-{version}-{sys.platform.lower()}'
+    baseUrl = f'https://github.com/premake/premake-core/releases/download/v{version}/premake-{version}'
     if sys.platform.startswith('linux'):
-        return baseUrl + '.tar.gz'
+        return baseUrl + '-linux.tar.gz'
     else:
-        return baseUrl + '.zip'
+        return baseUrl + '-windows.zip'
 
 def DownloadPremake(version = '5.0.0-beta2'):
     premakeDownloadUrl = GetPremakeDownloadUrl(version)
@@ -65,7 +65,7 @@ def DownloadPremake(version = '5.0.0-beta2'):
 
         if premakeDownloadUrl.endswith('zip'):
             with zipfile.ZipFile(premakeTargetZip, 'r') as zipFile:
-                zipFile.extract('premake5', premakeTargetFolder)
+                zipFile.extract('premake5.exe', premakeTargetFolder)
         else:
             with tarfile.open(premakeTargetZip, 'r') as tarFile:
                 tarFile.extract('./premake5', premakeTargetFolder)
