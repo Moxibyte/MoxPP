@@ -36,3 +36,6 @@ After you used this template for creating your new project please make sure to f
 - [ ] Now you can shall remove this readme file and replace it with your description of your project. 
 
 **There is more information in** `BUILDING.md` **(That you should keep) on how to build the project. We have an extensive video that showcases how this template works:** [VIDEO](VIDEO)
+
+## License
+The code shipped with MoxPP is licensed under the `MIT License`. All python and lua scripts have been marked in the file. Additional attribution is not required as long as the template is not redistributed itself. Feel free to use the template in all your projects as is and described. This is no legal advice! Consult your lawyer! 
