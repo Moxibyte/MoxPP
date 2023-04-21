@@ -37,7 +37,7 @@ function mox_discover_subfolders_win(folder)
     return io.popen("dir \"" .. folder .. "\" /b /ad"):lines()
 end
 function mox_discover_subfolders_linux(folder)
-    return io.popen("find \"./" .. folder .. "\" -maxdepth 1 -type d" ):lines()
+    return io.popen("find \"./" .. folder .. "\" -maxdepth 1 -type d -printf '%f\n'" ):lines()
 end
 
 
@@ -70,6 +70,7 @@ function mox_project(name, output_name)
         includedirs {
             "%{prj.location}",
             "%{wks.location}",
+            "%{wks.location}/" .. cmox_src_folder,
         }
 
         -- Debug / Release
@@ -89,7 +90,6 @@ function mox_project(name, output_name)
                     defines { 
                         "NDEBUG",
                         cmox_macro_prefix .. "NDEBUG",
-                        cmox_macro_prefix .. "RELEASE",
                     }
                     optimize "On"
                 end

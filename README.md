@@ -22,8 +22,8 @@ After you used this template for creating your new project please make sure to f
 - [ ] Check that the project works on your system:
     - [ ] Windows: Run `mox.bat init`, open the visual studio and build the solution (Batch build).
     - [ ] Linux: Run `./mox.sh autogen`. This should produce the file `./deploy/Release/package.zip` (You can also do this on windows. Run `mox.bat autogen` shall have the same result).
-- [ ] Take a look at `./mox.lua` (The configuration file for your repository) and understand all the settings. Modify them for your needs. 
-- [ ] Read and understand how `./src/build.py` works.
+- [ ] Take a look at `./mox.lua` (The configuration file for your repository) and understand all the settings. Modify them for your needs. If you modify `mox.lua` or any other project related `.lua` file later. Please make sure to always rerun `mox.bat init`. Copying or removing visual studio projects and solutions is only possible when visual studio is closed! You can remove all visual studio and makefile by running `mox.bat clean project`.  
+- [ ] Read and understand how `./src/build.lua` works.
 - [ ] Choose a project architecture `cmox_project_architecture` in `mox.lua`:
     - `single`: Only one single build file is used. Use this architecture if you are writing a simple project with only one executable and no shared or static libs.
     - `flat`: Flat build architecture in the source subfolder (`cmox_src_folder`). Each subfolder is one project with it's own dedicated `build.lua` file inside.
