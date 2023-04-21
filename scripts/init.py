@@ -27,9 +27,16 @@ import moxwin
 import os
 import sys
 import zipfile
+import tarfile
 import subprocess
 import urllib.request
-    
+
+def GetExecutable(exe):
+    if sys.platform.startswith('linux'):
+        return exe
+    else:
+        return f'{exe}.exe'
+
 def GetPremakeGenerator():
     if sys.platform.startswith('linux'):
         return 'gmake2'
@@ -37,20 +44,31 @@ def GetPremakeGenerator():
         vswhere = moxwin.FindLatestVisualStudio()
         vsversion = moxwin.GetVisualStudioYearNumber(vswhere)
         return f'vs{vsversion}'
-    
+
+def GetPremakeDownloadUrl(version):
+    baseUrl = f'https://github.com/premake/premake-core/releases/download/v{version}/premake-{version}-{sys.platform.lower()}'
+    if sys.platform.startswith('linux'):
+        return baseUrl + '.tar.gz'
+    else:
+        return baseUrl + '.zip'
+
 def DownloadPremake(version = '5.0.0-beta2'):
-    premakeDownloadUrl = f'https://github.com/premake/premake-core/releases/download/v{version}/premake-{version}-windows.zip'
+    premakeDownloadUrl = GetPremakeDownloadUrl(version)
     premakeTargetFolder = './dependencies/premake5'
-    pramekeTargetZip = f'{premakeTargetFolder}/premake5.zip'
-    premakeTargetExe = f'{premakeTargetFolder}/premake5.exe'
-    
+    premakeTargetZip = f'{premakeTargetFolder}/premake5.tmp'
+    premakeTargetExe = f'{premakeTargetFolder}/{GetExecutable("premake5")}'
+
     if not os.path.exists(premakeTargetExe):
         print('Downloading premake5...')
         os.makedirs(premakeTargetFolder, exist_ok=True)
-        urllib.request.urlretrieve(premakeDownloadUrl, pramekeTargetZip)
+        urllib.request.urlretrieve(premakeDownloadUrl, premakeTargetZip)
 
-        with zipfile.ZipFile(pramekeTargetZip, 'r') as zipFile:
-            zipFile.extract('premake5.exe', premakeTargetFolder)
+        if premakeDownloadUrl.endswith('zip'):
+            with zipfile.ZipFile(premakeTargetZip, 'r') as zipFile:
+                zipFile.extract('premake5', premakeTargetFolder)
+        else:
+            with tarfile.open(premakeTargetZip, 'r') as tarFile:
+                tarFile.extract('./premake5', premakeTargetFolder)
 
 def ConanBuild(conf):
     return (

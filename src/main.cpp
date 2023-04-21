@@ -4,5 +4,5 @@ int main()
 {
     // We will use spdlog to say hello! 
     // So that you can see that conan works :-)
-    spdlog::warn(L"Hello World!");
+    spdlog::warn("Hello World!");
 }

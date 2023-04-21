@@ -136,6 +136,7 @@ function mox_console()
         cmox_macro_prefix .. "APP", 
         cmox_macro_prefix .. "CONSOLE", 
     }
+    linkgroups "On"
     mox_add_conan_linking()
 end
 function mox_windowed()
@@ -144,6 +145,7 @@ function mox_windowed()
         cmox_macro_prefix .. "APP", 
         cmox_macro_prefix .. "WINDOWED",
     }
+    linkgroups "On"
     mox_add_conan_linking()
 end
 function mox_sharedlib()
@@ -152,6 +154,7 @@ function mox_sharedlib()
         cmox_macro_prefix .. "LIB",
         cmox_macro_prefix .. "LIB_SHARED",
     }
+    linkgroups "On"
     mox_add_conan_linking()
 end
 function mox_staticlib()

@@ -39,13 +39,20 @@ if __name__ == '__main__':
         # Executable name
         exe = sys.argv[argv_index]
         argv_index += 1
-        
+
         # Arguments
         args = sys.argv[argv_index::]
 
+	# Path to exe
+        exepath = f'build/x86_64-{conf}/bin/{exe}'
+        if sys.platform.startswith('linux'):
+            exepath = '../' + exepath
+        else:
+            exepath = './' + exepath
+
         # Run executable
         subprocess.run(
-            (f'./build/x86_64-{conf}/bin/{exe}', *args), 
+            (exepath, *args), 
             cwd='./app'
         )
     else:

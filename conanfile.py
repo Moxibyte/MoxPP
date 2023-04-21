@@ -7,6 +7,9 @@ class MoxPPRecipe(ConanFile):
     def requirements(self):
         self.requires("spdlog/1.11.0")
 
-    # Does not work?! Try in future conan versions
     def configure(self):
-        self.options["spdlog"].wchar_support = True
+	# This only works on windows (we added this so that you can see
+        # how to change settings of packages)
+	# self.options["spdlog"].wchar_support = True
+        pass
+

@@ -9,6 +9,9 @@
 /temp
 /deploy
 
+# Makefile
+**/Makefile
+
 # Visual Studio
 /.vs
 **.sln

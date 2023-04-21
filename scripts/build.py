@@ -33,7 +33,7 @@ def WindowsBuild(conf):
     vswhere = moxwin.FindLatestVisualStudio()
     vspath = moxwin.GetVisualStudioPath(vswhere)
     msbuild = f'{vspath}\\MSBuild\\Current\\Bin\\MSBuild.exe'
-    
+
     # Find solution file
     slnFiles = glob.glob('*.sln')
     if len(slnFiles) == 0:
@@ -47,7 +47,10 @@ def WindowsBuild(conf):
     ))
 
 def LinuxBuild(conf):
-    pass
+    # Run the makefile
+    subprocess.run((
+        'make', f'config={conf.lower()}', 'all'
+    ))
 
 if __name__ == '__main__':
     # Configuration from cli
