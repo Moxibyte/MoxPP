@@ -1,0 +1,4 @@
+
+# === GitHub linguist ===
+# Scripts will count towards vendored
+scripts/* linguist-vendored
