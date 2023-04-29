@@ -95,6 +95,20 @@ function mox_project(name, output_name)
                 end
             filter {}
         end
+  
+        -- Defines
+        filter { "system:windows" }
+            defines {
+                cmox_macro_prefix .. "OS_WINDOWS",
+                "WINVER=0x0A00",
+                "_WIN32_WINNT=0x0A00",
+            }
+        filter {}
+        filter { "system:unix" }
+            defines {
+                cmox_macro_prefix .. "OS_LINUX",
+            }
+        filter {}
 
         -- Ignore linker warning on windows
         if mox_is_windows() then
