@@ -5,7 +5,7 @@ This project supports
 
 ## Requirements
 - Python3 with:
-    - Conan2 (Version 2.0.4 or later; Install it via `pip install conan` / `pip3 install conan` on Linux) 
+    - Conan2 (Version 2.0.7 or later; Install it via `pip install conan` / `pip3 install conan` on Linux) 
 - Visual Studio with the C++ workloads (Windows)
 - build-essential (Linux)
 - CMake (Required for some conan packages, but not for the template)
