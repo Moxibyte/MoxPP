@@ -26,7 +26,7 @@ import json
 import subprocess
 
 def GetCodepage():
-    return subprocess.getoutput('chcp').split(':')[-1].strip()
+    return "".join(filter(str.isalnum, subprocess.getoutput('chcp').split(':')[-1].strip()))
     
 def FindLatestVisualStudio():
     vswhere = os.getenv('programfiles(x86)') + '\\Microsoft Visual Studio\\Installer\\vswhere.exe'
