@@ -75,7 +75,7 @@ def ConanBuild(conf):
         'conan', 'install', '.', 
         '--build', 'missing', 
         '--output-folder=./dependencies', 
-        '--deploy=full_deploy', 
+        '--deployer=full_deploy', 
         f'--settings=build_type={conf}',
         '--settings=compiler.cppstd=20',
     )
