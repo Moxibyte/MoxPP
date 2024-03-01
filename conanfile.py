@@ -5,7 +5,7 @@ class MoxPPRecipe(ConanFile):
     generators = "PremakeDeps"
 
     def requirements(self):
-        self.requires("spdlog/1.11.0")
+        self.requires("spdlog/1.13.0")
 
     def configure(self):
         # This only works on windows (we added this so that you can see
