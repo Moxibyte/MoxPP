@@ -11,10 +11,12 @@ cmox_product_name = "MoxPP"
 -- The second array _d are the configuration debug flags 
 -- (use true on all debugging configurations)
 cmox_configurations_n = { 
-    "Debug",  "Release"   
+    "Debug",  
+    "Release",   
 }
 cmox_configurations_d = { 
-    true,     false
+    true,
+    false,
 }
 
 -- SOURCE FOLDER NAME
@@ -42,7 +44,7 @@ cmox_project_architecture = "single"
 
 -- MACRO PREFIX
 -- This will be prepended to ALL non default macros
-cmox_macro_prefix = ""
+cmox_macro_prefix = "MOXPP_"
 
 -- === Custom callback functions ===
 -- This is the way to go when implementing custom features
