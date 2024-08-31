@@ -41,7 +41,7 @@ jobs:
     - name: Setup conan
       run: conan profile detect
     - name: MoxPP Init
-      run: ./mox.sh init
+      run: ./mox.bat init
     - name: MoxPP Build
-      run: ./mox.sh build
+      run: ./mox.bat build
     
