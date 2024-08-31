@@ -22,10 +22,10 @@ jobs:
     - name: Setup conan
       run: conan profile detect
     - name: MoxPP Init
-      working-directory: /
+      working-directory: repo
       run: ./mox.sh init
     - name: MoxPP Build
-      working-directory: /
+      working-directory: repo
       run: ./mox.sh build
      
   build_windows:
@@ -43,9 +43,9 @@ jobs:
     - name: Setup conan
       run: conan profile detect
     - name: MoxPP Init
-      working-directory: /
+      working-directory: repo
       run: ./mox.sh init
     - name: MoxPP Build
-      working-directory: /
+      working-directory: repo
       run: ./mox.sh build
     
