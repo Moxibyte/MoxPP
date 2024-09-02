@@ -2,5 +2,5 @@
 
 TEST(TestSuite, ExampleTest) 
 {
-    EXPECT_EQ(1 + 1, 3);
+    EXPECT_EQ(1 + 1, 2);
 }
