@@ -1,5 +1,5 @@
 # MoxPP
-C++ Template Repository with Conan2 and Premake5 for Windows and Linux.
+C++ Template Repository with Conan2 and Premake5 for Windows and Linux. Out of the Box unit-testing and GitHub actions.
 
 **Please make sure to read the WHOLE readme and follow all instructions!**
 
@@ -8,6 +8,7 @@ C++ Template Repository with Conan2 and Premake5 for Windows and Linux.
     - `Windows` for `Windows`
     - `Linux` for `Linux`
 - The project only support `x64` builds
+- The project uses GitHub Actions by default. Delete them if you don't want them. We will NOT cover any costs or results occurred because of actions or code shipped with this template! MIT Licenses also applies here!
 
 ## Dependencies
 Before you are getting started make sure to install the following applications:
@@ -33,6 +34,8 @@ After you used this template for creating your new project please make sure to f
 - [ ] In case you modified any of the build steps (Scripts themselves), make sure to change `BUILDING.md` so that it's still correct.
 - [ ] Adding your own scripts: You can add your own python scripts by adding them to the `./scripts` folder. You can run the script with the mox tool `mox.bat <SCRIPT_NAME>` working dir is the repository root. Make sure to your script to the list of actions in `BUILDING.md`.
 - [ ] Choosing your desired license. Make sure to add a license to the repository. All files that are copyright by us have already been marked with a license and thus are fine. This is no legal advice! Consult your lawyer! 
+- [ ] Disable unit-testing when required. By default we provide a dummy unit test, we encourage the use of unit-tests! If you don't want them you can disable them in `mox.lua` and delete the `test` directory. You can also modify the building of unit tests or the library. MoxPP is shipped with gtest but has no hard requirements on it.
+- [ ] Verify the usage of GitHub actions. We provide GitHub actions that build and test the codebase. Please make sure to delete the workflow files or disable action, in case you don't want to uses them!
 - [ ] Now you can shall remove this readme file and replace it with your description of your project. 
 
 **There is more information in** `BUILDING.md` **(That you should keep) on how to build the project.**

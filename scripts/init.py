@@ -2,7 +2,7 @@
 Project initialization script
 This will initialize your VisualStudio solution / Your makefile
 
-Copyright (c) 2023 Moxibyte GmbH
+Copyright (c) 2024 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -84,9 +84,14 @@ if __name__ == '__main__':
     # Download tool applications
     DownloadPremake()
 
+    skipConan = False
+    if len(sys.argv) > 1 and sys.argv[1] == 'skip_conan':
+        skipConan = True
+
     # Generate conan project
-    subprocess.run(ConanBuild('Debug'))
-    subprocess.run(ConanBuild('Release'))
+    if not skipConan:
+        subprocess.run(ConanBuild('Debug'))
+        subprocess.run(ConanBuild('Release'))
 
     # Run premake5
     premakeGenerator = GetPremakeGenerator()

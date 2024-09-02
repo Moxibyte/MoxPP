@@ -50,9 +50,10 @@ The above commands also fully work on windows (use `mox` or `mox.bat` instead of
 
 ## Actions
 The project provides the following actions. You can run them with the mox tool (`mox` or `mox.bat` on Windows. `./mox.sh` on linux):
-- **init**: This command will initialized the repository. On windows it will generate a solution, on linux Makefiles.
+- **init**: This command will initialized the repository. On windows it will generate a solution, on linux Makefiles. Will acquire all external libs via conan (Can be skipped to only run premake5). Usage: `./mox.bat/sh init [skip_conan]`. 
 - **build**: This command will build the project. Usage: `./mox.bat/sh build [conf]`.
 - **deploy**: This command will deploy a build. Usage: `./mox.bat/sh deploy [conf]`.
 - **clean**: This command will remove all regenerateable files of a certain category. Usage `./mox.bat/sh clean [type]` Where type can be (`output`, `project`, `dependencies`, or `all`. Defaults to `output`).
 - **run**: This will automatically run a specific executable in the correct working dir. Usage `./mox.bat/sh run [-c=Debug/Release/...] EXE [args...]`.
 - **autogen**: Will automatically run `init`, `build` and `deploy`.
+- **test**: Will run `init`, `build` (Release by default) and automatically invoke the `unittest` executable. The script will return the return code of the test application. Usage `./mox.bat/sh test [Debug/Release/...]`.
