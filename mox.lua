@@ -46,6 +46,12 @@ cmox_project_architecture = "single"
 -- This will be prepended to ALL non default macros
 cmox_macro_prefix = "MOXPP_"
 
+-- UNITTEST
+-- This defines where to find the unit test code.
+-- You can set this to nil. When set to nil no test will be configured. 
+-- You can delete the default test folder then
+cmox_unit_test_src = "test"
+
 -- === Custom callback functions ===
 -- This is the way to go when implementing custom features
 

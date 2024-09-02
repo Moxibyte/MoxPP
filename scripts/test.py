@@ -1,6 +1,6 @@
 """
-Root mox.py script
-This will automatically call other scripts with the mox.bat / mox.sh / mox.py shortcut
+Automatic generation script
+Will completely setup, build and deploy your project
 
 Copyright (c) 2024 Moxibyte GmbH
 
@@ -22,33 +22,23 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-import os
 import sys
-import os.path
 import subprocess
 
-def ScriptPath(script):
-    return f'./scripts/{script}.py'
-
 if __name__ == '__main__':
-    # Process arguments
-    args = sys.argv
-    if len(args) > 1:
-        script = args[1]
-        args = args[2::]
-    else:
-        script = 'autogen'
-        args = []    
+    # Configuration
+    conf = 'Release'
+    if len(sys.argv) > 1:
+        conf = sys.argv[1]
 
-    # Validate script
-    path = ScriptPath(script)
-    if os.path.isfile(path):
-        returncode = subprocess.run((sys.executable, path, *args)).returncode
-        sys.exit(returncode)
-    else:
-        print(f'Script "{script}" not found!')
-        print(f'')
-        print(f'Available scripts:')
-        for file in os.listdir('./scripts'):
-            if file.endswith('.py') and file != 'mox.py':
-                print(f'- {file[0:-3]}')
+    # Init project
+    subprocess.run((sys.executable, './scripts/mox.py', 'init'))
+
+    # Build project
+    subprocess.run((sys.executable, './scripts/mox.py', 'build', conf))
+
+    # Run test
+    test_result = subprocess.run((sys.executable, './scripts/mox.py', 'run', f'-c={conf}', 'unittest')).returncode
+
+    # Exit with result
+    sys.exit(test_result)

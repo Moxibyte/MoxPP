@@ -24,6 +24,8 @@ include "libmox.lua"
 include "../dependencies/conandeps.premake5.lua"
 include "../mox.lua"
 
+hmox_test_requirements = {}
+
 workspace(cmox_product_name)
     -- Workspace configuration
     configurations(cmox_configurations_n)
@@ -64,3 +66,8 @@ workspace(cmox_product_name)
     elseif cmox_project_architecture == "manual" then
         cmox_function_includeprojects()
     end
+
+    -- Unittest
+    if cmox_unit_test_src ~= nil then
+        include("../" .. cmox_unit_test_src .. "/build.lua")
+    end 

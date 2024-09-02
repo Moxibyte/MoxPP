@@ -2,7 +2,7 @@
 Project execution script
 This script will run the compiled application in the proper way.
 
-Copyright (c) 2023 Moxibyte GmbH
+Copyright (c) 2024 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ if __name__ == '__main__':
         # Arguments
         args = sys.argv[argv_index::]
 
-	# Path to exe
+	    # Path to exe
         exepath = f'build/x86_64-{conf}/bin/{exe}'
         if sys.platform.startswith('linux'):
             exepath = '../' + exepath
@@ -51,9 +51,12 @@ if __name__ == '__main__':
             exepath = './' + exepath
 
         # Run executable
-        subprocess.run(
+        returncode = subprocess.run(
             (exepath, *args), 
             cwd='./app'
-        )
+        ).returncode
+
+        # Exit with code
+        sys.exit(returncode)
     else:
         print('No executable provided!')

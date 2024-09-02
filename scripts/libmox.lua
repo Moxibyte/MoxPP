@@ -182,6 +182,18 @@ function mox_none()
     kind "None"
 end
 
+-- Unit testing interface
+function mox_setup_test()
+    group("")
+    mox_project("unittest")
+    mox_cpp()
+    mox_console()
+    links(hmox_test_requirements)
+end
+function mox_test_requirement()
+    table.insert(hmox_test_requirements, hmox_project_name)
+end
+
 
 -- Internal functions
 function mox_add_conan_linking_step(conf)

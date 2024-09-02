@@ -25,6 +25,9 @@ mox_cpp("C++20")
 --    Static library
 mox_console()
 
+-- Please uncomment the following line when you create a shared or static lib, that is required for the unittest
+-- mox_test_requirement()
+
 -- Further setup:
 -- Now you can all the premake5 setting you like
 -- https://premake.github.io/docs
