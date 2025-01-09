@@ -26,6 +26,7 @@ import moxwin
 
 import os
 import sys
+import stat
 import zipfile
 import tarfile
 import subprocess
@@ -68,7 +69,8 @@ def DownloadPremake(version = '5.0.0-beta4'):
                 zipFile.extract('premake5.exe', premakeTargetFolder)
         else:
             with tarfile.open(premakeTargetZip, 'r') as tarFile:
-                tarFile.extract('premake5', premakeTargetFolder)
+                tarFile.extractall(premakeTargetFolder, filter=tarfile.default_filter)
+            os.chmod(premakeTargetExe, os.stat(premakeTargetExe).st_mode | stat.S_IEXEC)
 
 def ConanBuild(conf):
     return (
