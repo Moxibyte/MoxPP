@@ -29,8 +29,30 @@ import sys
 import stat
 import zipfile
 import tarfile
+import platform
 import subprocess
 import urllib.request
+
+MOX_ARCH_MAP = {
+    # x86 32bit
+    "i386":         { "conan_arch": "x86",      "premake_arch": "x86" },        # Seen on linux
+    "i686":         { "conan_arch": "x86",      "premake_arch": "x86" },        # Seen on linux
+    "x86":          { "conan_arch": "x86",      "premake_arch": "x86" },        # Seen on windows
+
+    # x86 64bit
+    "amd64":        { "conan_arch": "x86_64",   "premake_arch": "x86_64" },     # Seen on windows
+    "x86_64":       { "conan_arch": "x86_64",   "premake_arch": "x86_64" },     # Seen on windows and linux
+
+    # ARM (32bit)
+    "arm":          { "conan_arch": "armv7",    "premake_arch": "ARM" },        # Seen on linux
+
+    # ARM64 
+    "arm64":        { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on windows
+    "aarch64":      { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
+    "aarch64_be":   { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
+    "armv8b":       { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
+    "armv8l":       { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
+}
 
 def GetExecutable(exe):
     if sys.platform.startswith('linux'):
@@ -53,6 +75,12 @@ def GetPremakeDownloadUrl(version):
     else:
         return baseUrl + '-windows.zip'
 
+def GetPlatformInfo():
+    arch = platform.machine().lower()
+    if not arch in MOX_ARCH_MAP:
+        raise ValueError(f'Architecture "{arch}" is not supported by MoxPP!')
+    return MOX_ARCH_MAP[arch]
+
 def DownloadPremake(version = '5.0.0-beta4'):
     premakeDownloadUrl = GetPremakeDownloadUrl(version)
     premakeTargetFolder = './dependencies/premake5'
@@ -72,29 +100,41 @@ def DownloadPremake(version = '5.0.0-beta4'):
                 tarFile.extractall(premakeTargetFolder, filter=tarfile.data_filter)
             os.chmod(premakeTargetExe, os.stat(premakeTargetExe).st_mode | stat.S_IEXEC)
 
-def ConanBuild(conf):
+def ConanBuild(conf, arch):
     return (
         'conan', 'install', '.', 
         '--build', 'missing', 
         '--output-folder=./dependencies', 
         '--deployer=full_deploy', 
+        f'--settings=arch={arch}',
         f'--settings=build_type={conf}',
         '--settings=compiler.cppstd=20',
     )
 
 if __name__ == '__main__':
-    # Download tool applications
-    DownloadPremake()
-
+    # Conan skip evaluation
     skipConan = False
     if len(sys.argv) > 1 and sys.argv[1] == 'skip_conan':
         skipConan = True
 
+    # Download tool applications
+    DownloadPremake()
+
+    # Get system architecture
+    arch = GetPlatformInfo()
+    print(f'Generating project on { platform.machine().lower() } for conan={ arch["conan_arch"] } and premake={arch["premake_arch"]}')
+
     # Generate conan project
     if not skipConan:
-        subprocess.run(ConanBuild('Debug'))
-        subprocess.run(ConanBuild('Release'))
+        subprocess.run(ConanBuild('Debug', arch["conan_arch"]))
+        subprocess.run(ConanBuild('Release', arch["conan_arch"]))
 
     # Run premake5
     premakeGenerator = GetPremakeGenerator()
-    subprocess.run(('./dependencies/premake5/premake5', '--file=./scripts/premake5.lua', premakeGenerator))
+    subprocess.run((
+        './dependencies/premake5/premake5', 
+        f'--mox_conan_arch={ arch["conan_arch"] }',
+        f'--mox_premake_arch={ arch["premake_arch"] }',
+        '--file=./scripts/premake5.lua', 
+        premakeGenerator
+    ))

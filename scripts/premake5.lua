@@ -1,6 +1,6 @@
 -- premake5.lua root script
 -- 
--- Copyright (c) 2023 Moxibyte GmbH
+-- Copyright (c) 2025 Moxibyte GmbH
 -- 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,35 @@ include "../mox.lua"
 
 hmox_test_requirements = {}
 
+newoption {
+    trigger = "mox_premake_arch",
+    value = "ARCH",
+    description = "Defines the architecture to use for building the project (premake native)",
+    allowed = {
+        { "x86", "32-Bit x86" },
+        { "x86_64", "64-Bit x86" },
+        { "ARM", "32-Bit ARM" },
+        { "ARM64", "64-Bit ARM" },
+    },
+    default = "x86_64"
+}
+newoption {
+    trigger = "mox_conan_arch",
+    value = "ARCH",
+    description = "Defines the architecture to use by the dependencies",
+    allowed = {
+        { "x86", "32-Bit x86" },
+        { "x86_64", "64-Bit x86" },
+        { "armv7", "armv7 (32-Bit)" },
+        { "armv8", "armv8 (64-Bit)" },
+    },
+    default = "x86_64"
+}
+
 workspace(cmox_product_name)
     -- Workspace configuration
     configurations(cmox_configurations_n)
-    architecture "x64"
+    architecture(_OPTIONS["mox_premake_arch"])
     location "../"
 
     -- Custom workspace configuration

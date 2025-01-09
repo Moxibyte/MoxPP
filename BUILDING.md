@@ -2,6 +2,10 @@
 This project supports
 - [x] Windows
 - [x] Linux
+- [x] 32-Bit x86
+- [x] 32-Bit ARM
+- [x] 64-Bit x86_64
+- [x] 64-Bit ARM64
 
 ## Requirements
 - Python3 with:
@@ -36,12 +40,12 @@ On linux you can directly start editing the code without any solution. Use the t
 
 As soon as you are ready to build run the following commands
 ```sh
-# It's recommented to run init after the first clone and after creating / moving / deleting files. 
+# It's recommended to run init after the first clone and after creating / moving / deleting files. 
 ./mox.sh init
 # This is the raw linux "make". You can add the configuration as an argument
 ./mox.sh build 
 ./mox.sh build Debug
-# This is how you can run the compiled application in the proper way from the repositiory root
+# This is how you can run the compiled application in the proper way from the repository root
 ./mox.sh run EXECUTABLE_NAME
 # Optional with the configuration
 ./mox.sh run -c=Debug EXECUTABLE_NAME

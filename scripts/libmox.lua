@@ -96,7 +96,7 @@ function mox_project(name, output_name)
             filter {}
         end
   
-        -- Defines
+        -- Define: OS
         filter { "system:windows" }
             defines {
                 cmox_macro_prefix .. "OS_WINDOWS",
@@ -109,6 +109,37 @@ function mox_project(name, output_name)
                 cmox_macro_prefix .. "OS_LINUX",
             }
         filter {}
+
+        -- Define: Architecture
+        filter { "architecture:x86" }
+            defines {
+                cmox_macro_prefix .. "ARCH_X86",
+                cmox_macro_prefix .. "ARCH_TYPE_X86",
+                cmox_macro_prefix .. "BIT_32",
+            }
+        filter {}
+        filter { "architecture:x86_64" }
+            defines {
+                cmox_macro_prefix .. "ARCH_X86_64",
+                cmox_macro_prefix .. "ARCH_TYPE_X86",
+                cmox_macro_prefix .. "BIT_64",
+            }
+        filter {}
+        filter { "architecture:ARM" }
+            defines {
+                cmox_macro_prefix .. "ARCH_ARM",
+                cmox_macro_prefix .. "ARCH_TYPE_ARM",
+                cmox_macro_prefix .. "BIT_32",
+            }
+        filter {}
+        filter { "architecture:ARM64" }
+            defines {
+                cmox_macro_prefix .. "ARCH_ARM64",
+                cmox_macro_prefix .. "ARCH_TYPE_ARM",
+                cmox_macro_prefix .. "BIT_64",
+            }
+        filter {}
+
 
         -- Ignore linker warning on windows
         if mox_is_windows() then
@@ -207,9 +238,9 @@ function mox_add_conan_itterate(func)
         local is_debug = cmox_configurations_d[idx]
         filter { "configurations:" .. conf }
             if is_debug then
-                func("debug_x86_64")
+                func("debug_" .. _OPTIONS["mox_conan_arch"])
             else
-                func("release_x86_64")
+                func("release_" .. _OPTIONS["mox_conan_arch"])
             end
         filter {}
     end
