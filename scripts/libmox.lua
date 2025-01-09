@@ -1,6 +1,6 @@
 -- Lua utils for MoxPP
 -- 
--- Copyright (c) 2023 Moxibyte GmbH
+-- Copyright (c) 2025 Moxibyte GmbH
 -- 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -104,7 +104,7 @@ function mox_project(name, output_name)
                 "_WIN32_WINNT=0x0A00",
             }
         filter {}
-        filter { "system:unix" }
+        filter { "system:unix or linux" }
             defines {
                 cmox_macro_prefix .. "OS_LINUX",
             }

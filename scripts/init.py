@@ -2,7 +2,7 @@
 Project initialization script
 This will initialize your VisualStudio solution / Your makefile
 
-Copyright (c) 2024 Moxibyte GmbH
+Copyright (c) 2025 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ def GetPremakeDownloadUrl(version):
     else:
         return baseUrl + '-windows.zip'
 
-def DownloadPremake(version = '5.0.0-beta2'):
+def DownloadPremake(version = '5.0.0-beta4'):
     premakeDownloadUrl = GetPremakeDownloadUrl(version)
     premakeTargetFolder = './dependencies/premake5'
     premakeTargetZip = f'{premakeTargetFolder}/premake5.tmp'
