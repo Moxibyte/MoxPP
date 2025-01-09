@@ -22,6 +22,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import mox
 import moxwin
 
 import os
@@ -32,27 +33,6 @@ import tarfile
 import platform
 import subprocess
 import urllib.request
-
-MOX_ARCH_MAP = {
-    # x86 32bit
-    "i386":         { "conan_arch": "x86",      "premake_arch": "x86" },        # Seen on linux
-    "i686":         { "conan_arch": "x86",      "premake_arch": "x86" },        # Seen on linux
-    "x86":          { "conan_arch": "x86",      "premake_arch": "x86" },        # Seen on windows
-
-    # x86 64bit
-    "amd64":        { "conan_arch": "x86_64",   "premake_arch": "x86_64" },     # Seen on windows
-    "x86_64":       { "conan_arch": "x86_64",   "premake_arch": "x86_64" },     # Seen on windows and linux
-
-    # ARM (32bit)
-    "arm":          { "conan_arch": "armv7",    "premake_arch": "ARM" },        # Seen on linux
-
-    # ARM64 
-    "arm64":        { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on windows
-    "aarch64":      { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
-    "aarch64_be":   { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
-    "armv8b":       { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
-    "armv8l":       { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
-}
 
 def GetExecutable(exe):
     if sys.platform.startswith('linux'):
@@ -74,12 +54,6 @@ def GetPremakeDownloadUrl(version):
         return baseUrl + '-linux.tar.gz'
     else:
         return baseUrl + '-windows.zip'
-
-def GetPlatformInfo():
-    arch = platform.machine().lower()
-    if not arch in MOX_ARCH_MAP:
-        raise ValueError(f'Architecture "{arch}" is not supported by MoxPP!')
-    return MOX_ARCH_MAP[arch]
 
 def DownloadPremake(version = '5.0.0-beta4'):
     premakeDownloadUrl = GetPremakeDownloadUrl(version)
@@ -121,7 +95,7 @@ if __name__ == '__main__':
     DownloadPremake()
 
     # Get system architecture
-    arch = GetPlatformInfo()
+    arch = mox.GetPlatformInfo()
     print(f'Generating project on { platform.machine().lower() } for conan={ arch["conan_arch"] } and premake={arch["premake_arch"]}')
 
     # Generate conan project

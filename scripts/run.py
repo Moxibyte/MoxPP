@@ -2,7 +2,7 @@
 Project execution script
 This script will run the compiled application in the proper way.
 
-Copyright (c) 2024 Moxibyte GmbH
+Copyright (c) 2025 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import mox
 import sys
 import subprocess
 
@@ -35,6 +36,9 @@ if __name__ == '__main__':
             conf = sys.argv[argv_index][3::]
             argv_index += 1
 
+    # Architecture
+    arch = mox.GetPlatformInfo()["premake_arch"]
+
     if len(sys.argv) > argv_index:
         # Executable name
         exe = sys.argv[argv_index]
@@ -44,7 +48,7 @@ if __name__ == '__main__':
         args = sys.argv[argv_index::]
 
 	    # Path to exe
-        exepath = f'build/x86_64-{conf}/bin/{exe}'
+        exepath = f'build/{arch}-{conf}/bin/{exe}'
         if sys.platform.startswith('linux'):
             exepath = '../' + exepath
         else:
