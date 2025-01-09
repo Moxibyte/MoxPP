@@ -68,7 +68,7 @@ def DownloadPremake(version = '5.0.0-beta4'):
                 zipFile.extract('premake5.exe', premakeTargetFolder)
         else:
             with tarfile.open(premakeTargetZip, 'r') as tarFile:
-                tarFile.extract('./premake5', premakeTargetFolder)
+                tarFile.extract('premake5', premakeTargetFolder)
 
 def ConanBuild(conf):
     return (
