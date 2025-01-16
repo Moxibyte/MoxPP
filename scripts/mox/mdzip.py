@@ -1,8 +1,6 @@
 """
-The deployment script is written minimal by default!
-Add your own code to the main "function"
-
-The script is by default called with "Release" in the first argument
+MDZip - MoxPP Deploy 
+Packes into a zip file
 
 Copyright (c) 2025 Moxibyte GmbH
 
@@ -24,28 +22,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-import mox
 import os
-import sys
 import zipfile
 
-if __name__ == '__main__':
-    # Configuration for the build
-    conf = 'Release'
-    if len(sys.argv) > 1:
-        conf = sys.argv[1]
+class MDZip:
+    def __init__(self, filename):
+        self.__path = filename
+        self.__files = []
 
-    # Architecture
-    arch = mox.GetPlatformInfo()["premake_arch"]
+    def AddFile(self, file, name):
+        self.__files.append((file, name))
 
-    # Work directory's
-    deployDir = f'./deploy/'
-    tempDir = f'./temp/{arch}-{conf}/'
-    os.makedirs(deployDir, exist_ok=True)
-    os.makedirs(tempDir, exist_ok=True)
+    def AddFolder(self, folder, name):
+        for file in os.listdir(folder):
+            path = f'{folder}/{file}'
+            if os.path.isfile(path):
+                self.AddFile(path, f'{name}/{file}')
 
-    # We will do a quick copy from the out folder
-    # TODO: Add your own implementation
-    zipArchive = mox.MDZip(deployDir + mox.AutomaticFilename("moxpp", "1.0.0", conf, "zip"))
-    zipArchive.AddFolder(f'./build/{arch}-{conf}/bin', '')
-    zipArchive.Pack()
+    def Pack(self):
+        with zipfile.ZipFile(self.__path, 'w') as zip_file:
+            for file in self.__files:
+                zip_file.write(file[0], file[1])

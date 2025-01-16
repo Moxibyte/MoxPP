@@ -49,3 +49,9 @@ def GetPlatformInfo():
     if not arch in MOX_ARCH_MAP:
         raise ValueError(f'Architecture "{arch}" is not supported by MoxPP!')
     return MOX_ARCH_MAP[arch]
+
+def GetFilename(product, version, system, conf, arch, extension):
+    return f'{product}-{version}-{system}-{conf}-{arch}.{extension}' # project_name-1.0.0-Windows-Release-x86_64.zip
+
+def AutomaticFilename(product, version, conf, extension):
+    return GetFilename(product, version, platform.system(), conf, GetPlatformInfo()["premake_arch"], extension)
