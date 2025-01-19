@@ -1,9 +1,9 @@
 # Building the project
 This project supports building on
-| OS          | x86 | x86_64 | ARM | ARM64 |
-| ----------- | --- | ------ | --- | ----- |
-| **Windows** |✅   |✅     |✅  |✅     |
-| **Linux**   |✅   |✅     |✅  |✅     |
+| OS          | x86                | x86_64             | ARM                | ARM64              |
+| ----------- | ------------------ | ------------------ | ------------------ | ------------------ |
+| **Windows** | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| **Linux**   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ## Requirements
 - Python3 with:
