@@ -4,7 +4,7 @@ Add your own code to the main "function"
 
 The script is by default called with "Release" in the first argument
 
-Copyright (c) 2025 Moxibyte GmbH
+Copyright (c) 2025 Ludwig Füchsl
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,17 +35,20 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         conf = sys.argv[1]
 
+    # Version detection
+    version = mox.GetAppVersion()
+
     # Architecture
     arch = mox.GetPlatformInfo()["premake_arch"]
 
-    # Work directory's
-    deployDir = f'./deploy/'
-    tempDir = f'./temp/{arch}-{conf}/'
-    os.makedirs(deployDir, exist_ok=True)
-    os.makedirs(tempDir, exist_ok=True)
-
-    # We will do a quick copy from the out folder
     # TODO: Add your own implementation
-    zipArchive = mox.MDZip(deployDir + mox.AutomaticFilename("moxpp", "1.0.0", conf, "zip"))
+    #       We do some quick example here
+
+    # Simple zip archive with the software (dumb copy)
+    zipArchive = mox.MDZip(mox.AutomaticFilename("moxpp", version, conf, "zip"))
     zipArchive.AddFolder(f'./build/{arch}-{conf}/bin', '')
-    zipArchive.Pack()
+    zipArchive.Deploy()
+
+    # Source archive
+    srcArchive = mox.MDSrc(mox.AutomaticFilename("moxpp_src", version, conf, "zip"))
+    srcArchive.Deploy()

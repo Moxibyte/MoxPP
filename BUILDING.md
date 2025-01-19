@@ -1,11 +1,9 @@
 # Building the project
-This project supports
-- [x] Windows
-- [x] Linux
-- [x] 32-Bit x86
-- [x] 32-Bit ARM
-- [x] 64-Bit x86_64
-- [x] 64-Bit ARM64
+This project supports building on
+| OS          | x86 | x86_64 | ARM | ARM64 |
+| ----------- | --- | ------ | --- | ----- |
+| **Windows** |✅   |✅     |✅  |✅     |
+| **Linux**   |✅   |✅     |✅  |✅     |
 
 ## Requirements
 - Python3 with:
@@ -51,6 +49,9 @@ As soon as you are ready to build run the following commands
 ./mox.sh run -c=Debug EXECUTABLE_NAME
 ```
 The above commands also fully work on windows (use `mox` or `mox.bat` instead of `./mox.sh`).
+
+## Releases
+This project is designed to automatically set it's version macro and release all artifacts. This happens via GitHub actions (if not deleted) or via a manual `mox deploy` call. The call expects a environment variable `MOXPP_VERSION` to be set to the current version string (Will be automatically the tag name of the github release when using actions). The deploy process can be seen in `/scripts/deploy.py`.
 
 ## Actions
 The project provides the following actions. You can run them with the mox tool (`mox` or `mox.bat` on Windows. `./mox.sh` on linux):

@@ -1,7 +1,7 @@
 """
 Generic util functions
 
-Copyright (c) 2025 Moxibyte GmbH
+Copyright (c) 2025 Ludwig Füchsl
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import os
 import platform
 
 MOX_ARCH_MAP = {
@@ -55,3 +56,9 @@ def GetFilename(product, version, system, conf, arch, extension):
 
 def AutomaticFilename(product, version, conf, extension):
     return GetFilename(product, version, platform.system(), conf, GetPlatformInfo()["premake_arch"], extension)
+
+def GetAppVersion(default="unknown"):
+    version = os.environ.get("MOXPP_VERSION")
+    if version is None:
+        return default
+    return version

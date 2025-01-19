@@ -2,7 +2,7 @@
 Project initialization script
 This will initialize your VisualStudio solution / Your makefile
 
-Copyright (c) 2025 Moxibyte GmbH
+Copyright (c) 2025 Ludwig Füchsl
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -98,6 +98,10 @@ if __name__ == '__main__':
     arch = mox.GetPlatformInfo()
     print(f'Generating project on { platform.machine().lower() } for conan={ arch["conan_arch"] } and premake={arch["premake_arch"]}')
 
+    # Version detection
+    version = mox.GetAppVersion()
+    print(f'Version is { version }')
+
     # Generate conan project
     if not skipConan:
         subprocess.run(ConanBuild('Debug', arch["conan_arch"]))
@@ -109,6 +113,7 @@ if __name__ == '__main__':
         './dependencies/premake5/premake5', 
         f'--mox_conan_arch={ arch["conan_arch"] }',
         f'--mox_premake_arch={ arch["premake_arch"] }',
+        f'--mox_version={ version }',
         '--file=./scripts/premake5.lua', 
         premakeGenerator
     ))

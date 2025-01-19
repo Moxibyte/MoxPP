@@ -1,6 +1,6 @@
 -- premake5.lua root script
 -- 
--- Copyright (c) 2025 Moxibyte GmbH
+-- Copyright (c) 2025 Ludwig Füchsl
 -- 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ newoption {
     trigger = "mox_premake_arch",
     value = "ARCH",
     description = "Defines the architecture to use for building the project (premake native)",
+    category = "MoxPP",
     allowed = {
         { "x86", "32-Bit x86" },
         { "x86_64", "64-Bit x86" },
@@ -42,6 +43,7 @@ newoption {
     trigger = "mox_conan_arch",
     value = "ARCH",
     description = "Defines the architecture to use by the dependencies",
+    category = "MoxPP",
     allowed = {
         { "x86", "32-Bit x86" },
         { "x86_64", "64-Bit x86" },
@@ -49,6 +51,13 @@ newoption {
         { "armv8", "armv8 (64-Bit)" },
     },
     default = "x86_64"
+}
+newoption {
+    trigger = "mox_version",
+    value = "VERSION",
+    description = "Set the version string injected as preprocessor macro",
+    category = "MoxPP",
+    default = "unknown"
 }
 
 workspace(cmox_product_name)

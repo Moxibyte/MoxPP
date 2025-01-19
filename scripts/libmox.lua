@@ -1,6 +1,6 @@
 -- Lua utils for MoxPP
 -- 
--- Copyright (c) 2025 Moxibyte GmbH
+-- Copyright (c) 2025 Ludwig Füchsl
 -- 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -71,6 +71,10 @@ function mox_project(name, output_name)
             "%{prj.location}",
             "%{wks.location}",
             "%{wks.location}/" .. cmox_src_folder,
+        }
+
+        defines {
+            cmox_macro_prefix .. "VERSION=\"" .. _OPTIONS["mox_version"] .. "\"",
         }
 
         -- Debug / Release

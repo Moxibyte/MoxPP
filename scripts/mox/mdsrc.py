@@ -1,6 +1,6 @@
 """
 MDZip - MoxPP Deploy 
-Packes into a zip file
+Packes sources into a zip file
 
 Copyright (c) 2025 Ludwig Füchsl
 
@@ -23,24 +23,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import os
-import zipfile
+import subprocess
 
-class MDZip:
+class MDSrc:
     def __init__(self, filename, deployDir='./deploy'):
         os.makedirs(deployDir, exist_ok=True)
         self.__path =  deployDir + "/" + filename
-        self.__files = []
-
-    def AddFile(self, file, name):
-        self.__files.append((file, name))
-
-    def AddFolder(self, folder, name):
-        for file in os.listdir(folder):
-            path = f'{folder}/{file}'
-            if os.path.isfile(path):
-                self.AddFile(path, f'{name}/{file}')
 
     def Deploy(self):
-        with zipfile.ZipFile(self.__path, 'w') as zip_file:
-            for file in self.__files:
-                zip_file.write(file[0], file[1])
+        subprocess.run((
+            'git', 'archive',
+            '--format=zip',
+            f'--output={ self.__path }',
+            'HEAD',
+        ))

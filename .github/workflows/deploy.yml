@@ -1,0 +1,69 @@
+name: Deploy
+
+on:
+  release:
+    types:
+      - released  
+  
+jobs:
+  deploy_linux:
+    name: Deploy Linux
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set version environment variable
+      run: echo "MOXPP_VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12' 
+    - name: Install conan
+      run: pip install conan
+    - name: Setup conan
+      run: conan profile detect
+    - name: MoxPP Init
+      run: ./mox.sh init
+    - name: MoxPP Build
+      run: ./mox.sh build
+    - name: MoxPP Deploy
+      run: ./mox.sh deploy
+    - name: Upload artifacts
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: deploy/*
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+
+  deploy_windows:
+    name: Deploy Windows
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set version environment variable
+      shell: pwsh
+      run: echo "MOXPP_VERSION=${{ github.event.release.tag_name }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12' 
+    - name: Install conan
+      run: pip install conan
+    - name: Setup conan
+      run: conan profile detect
+    - name: MoxPP Init
+      run: ./mox.bat init
+    - name: MoxPP Build
+      run: ./mox.bat build
+    - name: Upload artifacts
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: deploy/*
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+    
