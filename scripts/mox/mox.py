@@ -23,6 +23,7 @@ SOFTWARE.
 """
 import os
 import platform
+import datetime
 
 MOX_ARCH_MAP = {
     # x86 32bit
@@ -57,8 +58,10 @@ def GetFilename(product, version, system, conf, arch, extension):
 def AutomaticFilename(product, version, conf, extension):
     return GetFilename(product, version, platform.system(), conf, GetPlatformInfo()["premake_arch"], extension)
 
-def GetAppVersion(default="unknown"):
+def GetAppVersion(default=""):
     version = os.environ.get("MOXPP_VERSION")
     if version is None:
-        return default
+        if len(default) > 0:
+            return default
+        return f"0.0.0+dev.{ datetime.datetime.now().strftime('%Y%m%d') }"
     return version
