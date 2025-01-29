@@ -19,5 +19,5 @@
 **.vcxproj.user
 **.vcxproj.filters
 
-# Dependencies graph output
-/dependencies.html
+# Dependencie graph output
+/dependencies_*.html
