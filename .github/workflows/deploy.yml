@@ -61,6 +61,8 @@ jobs:
       run: ./mox.bat init
     - name: MoxPP Build
       run: ./mox.bat build
+    - name: MoxPP Deploy
+      run: ./mox.bat deploy
     - name: Upload artifacts
       uses: svenstaro/upload-release-action@v2
       with:
