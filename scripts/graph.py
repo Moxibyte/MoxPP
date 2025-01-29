@@ -22,11 +22,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-import sys
+import platform
 import subprocess
 
 if __name__ == '__main__':
-    with open('./dependencies.html', "w") as outfile:
+    with open(f'./dependencies_{ platform.system() }.html', "w") as outfile:
         subprocess.run((
             "conan", "graph", "info", "./conanfile.py", "--format=html"
         ), stdout=outfile)

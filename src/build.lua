@@ -33,7 +33,13 @@ mox_console()
 -- https://premake.github.io/docs
 
 -- Use the following to add linking to other projects
--- links { "ProjectName", "ProjectName2", ... }
+-- links { 
+--     "ProjectName", 
+--     "ProjectName2",
+-- }
 
 -- Use the following to build after other projects
--- dependson { "ProjectName", "ProjectName2", ... }
+-- dependson { 
+--     "ProjectName", 
+--     "ProjectName2",
+-- }
