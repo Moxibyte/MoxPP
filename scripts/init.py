@@ -106,6 +106,11 @@ if __name__ == '__main__':
     if not skipConan:
         subprocess.run(ConanBuild('Debug', arch["conan_arch"]))
         subprocess.run(ConanBuild('Release', arch["conan_arch"]))
+        # Copy conan dlls
+        subprocess.run((
+            sys.executable, 
+            './scripts/copydlls.py'
+        ))
 
     # Run premake5
     premakeGenerator = GetPremakeGenerator()

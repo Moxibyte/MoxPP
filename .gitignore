@@ -3,6 +3,7 @@
 
 # Dependency output
 /dependencies
+/dlls
 
 # Build Output
 /build
