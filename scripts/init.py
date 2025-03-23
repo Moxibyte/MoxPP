@@ -82,7 +82,7 @@ def ConanBuild(conf, arch):
         '--deployer=full_deploy', 
         f'--settings=arch={arch}',
         f'--settings=build_type={conf}',
-        '--settings=compiler.cppstd=20',
+        '--settings=compiler.cppstd=23',
     )
 
 if __name__ == '__main__':

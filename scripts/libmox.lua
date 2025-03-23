@@ -171,7 +171,7 @@ function mox_cs(dotnet)
 end
 function mox_cpp(cppstd)
     if cppstd==nil then
-        cppstd = "C++20"
+        cppstd = "C++23"
     end
     
     language "C++"
