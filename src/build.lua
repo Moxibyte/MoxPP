@@ -8,10 +8,10 @@ mox_project("HelloWorld", "hello_world")
 -- Options
 -- A) mox_c()
 -- B) mox_cpp(cppstd)
---    cppstd: C++ Version (optional, default to C++20)
+--    cppstd: C++ Version (optional, default to C++23)
 -- C) mox_cs(dotnet)
 --    notnet: .NET Framework version (optional, default to 4.6)
-mox_cpp("C++20")
+mox_cpp("C++23")
 
 -- This line select the type of output
 -- Options
