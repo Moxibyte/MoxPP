@@ -13,7 +13,7 @@ class MoxPPRecipe(ConanFile):
         self.requires("gtest/1.15.0") 
 
     def configure(self):
-        # This only works on windows (we added this so that you can see
-        # how to change settings of packages)
-        # self.options["spdlog"].wchar_support = True
-        pass
+        # We set spdlog to be shared lib. This is only done for testing the mechanisms of dll copying in ci
+        # This also serves as an example how options are set
+        # Feel free to change to your desires
+        self.options["spdlog"].shared = True

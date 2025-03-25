@@ -39,7 +39,25 @@ end
 function mox_discover_subfolders_linux(folder)
     return io.popen("find \"./" .. folder .. "\" -maxdepth 1 -type d -printf '%f\n'" ):lines()
 end
+function mox_cli_mox_command(command)
+    if mox_is_windows() then
+        return "python %{wks.location}/scripts/mox.py " .. command
+    else
+        return "python3 %{wks.location}/scripts/mox.py " .. command
+    end
+end
 
+-- For you usable helpers
+function mox_runpy_postbuild(command)
+    postbuildcommands {
+        mox_cli_mox_command(command)
+    }
+end
+function mox_runpy_prebuild(command)
+    prebuildcommands {
+        mox_cli_mox_command(command)
+    }
+end
 
 -- For you usable functions
 function mox_project(name, output_name)
@@ -144,6 +162,20 @@ function mox_project(name, output_name)
             }
         filter {}
 
+        -- DLL Distribution
+        if cmox_copy_dlls then
+            for idx,conf in pairs(cmox_configurations_n) do
+                local is_debug = cmox_configurations_d[idx]
+                
+                filter { "configurations:" .. conf, "kind:ConsoleApp or WindowedApp" }
+                    if is_debug then
+                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Debug %{cfg.targetdir}")
+                    else
+                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Release %{cfg.targetdir}")
+                    end
+                filter {}
+            end
+        end
 
         -- Ignore linker warning on windows
         if mox_is_windows() then

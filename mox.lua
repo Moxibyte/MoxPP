@@ -42,6 +42,10 @@ cmox_src_folder = "src"
 --                  function.
 cmox_project_architecture = "single" 
 
+-- DLL DISTRIBUTING
+-- When enabled, dlls will be copied as a postbuild-step to the output directory
+cmox_copy_dlls = true
+
 -- MACRO PREFIX
 -- This will be prepended to ALL non default macros
 cmox_macro_prefix = "MOXPP_"

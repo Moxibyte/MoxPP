@@ -28,7 +28,8 @@ import os.path
 import subprocess
 
 def ScriptPath(script):
-    return f'./scripts/{script}.py'
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_dir, f"{script}.py")
 
 if __name__ == '__main__':
     # Process arguments
@@ -49,6 +50,6 @@ if __name__ == '__main__':
         print(f'Script "{script}" not found!')
         print(f'')
         print(f'Available scripts:')
-        for file in os.listdir('./scripts'):
+        for file in os.listdir(os.path.dirname(os.path.abspath(__file__))):
             if file.endswith('.py') and file != 'mox.py':
                 print(f'- {file[0:-3]}')
