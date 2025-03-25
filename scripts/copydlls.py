@@ -58,17 +58,17 @@ def copy_binaries(source_root, debug_dest, release_dest):
                 print(f"Skipping {lib_dir}, expected exactly one platform directory but found {len(platforms)}")
                 continue
 
-            platform_path = platforms[0] / "bin"
-            if not platform_path.exists():
-                continue
+            dll_dirs = ( "bin", "lib" )
+            for dll_dir in dll_dirs:
+                platform_path = platforms[0] / dll_dir
+                if platform_path.exists():
+                    dest_dir = debug_dest if build_type == "Debug" else release_dest
+                    dest_dir.mkdir(parents=True, exist_ok=True)
 
-            dest_dir = debug_dest if build_type == "Debug" else release_dest
-            dest_dir.mkdir(parents=True, exist_ok=True)
-
-            for binary_file in platform_path.glob(f"*{binary_ext}"):
-                dest_file = dest_dir / binary_file.name
-                shutil.copy2(binary_file, dest_file)
-                print(f"Copied {binary_file} -> {dest_file}")
+                    for binary_file in platform_path.glob(f"*{binary_ext}"):
+                        dest_file = dest_dir / binary_file.name
+                        shutil.copy2(binary_file, dest_file)
+                        print(f"Copied {binary_file} -> {dest_file}")
 
 if __name__ == "__main__":
     # Example usage
