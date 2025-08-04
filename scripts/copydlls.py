@@ -1,7 +1,7 @@
 """
 Script that copies all conan .dll/.so files to a dedicated directory
 
-Copyright (c) 2025 Ludwig Füchsl
+Copyright (c) 2025 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +65,7 @@ def copy_binaries(source_root, debug_dest, release_dest):
                     dest_dir = debug_dest if build_type == "Debug" else release_dest
                     dest_dir.mkdir(parents=True, exist_ok=True)
 
-                    for binary_file in platform_path.glob(f"*{binary_ext}"):
+                    for binary_file in platform_path.rglob(f"*{binary_ext}"):
                         dest_file = dest_dir / binary_file.name
                         shutil.copy2(binary_file, dest_file)
                         print(f"Copied {binary_file} -> {dest_file}")

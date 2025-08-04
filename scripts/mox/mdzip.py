@@ -2,7 +2,7 @@
 MDZip - MoxPP Deploy 
 Packes into a zip file
 
-Copyright (c) 2025 Ludwig Füchsl
+Copyright (c) 2025 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import os
+import sys
+import moxwin
 import zipfile
+import pathlib
 
 class MDZip:
     def __init__(self, filename, deployDir='./deploy'):
@@ -39,6 +42,17 @@ class MDZip:
             path = f'{folder}/{file}'
             if os.path.isfile(path):
                 self.AddFile(path, f'{name}/{file}')
+
+    def AddMSVCRedists(self):
+        if sys.platform.startswith('win'):
+            vswhere = moxwin.FindLatestVisualStudio()
+            vspath = moxwin.GetVisualStudioPath(vswhere)
+            redist_base_dir = pathlib.Path(vspath) / 'VC' / 'Redist' / 'MSVC'
+            redist_canidates = sorted(redist_base_dir.glob('v*/vc_redist.x64.exe'), reverse=True)
+            if redist_canidates and len(redist_canidates) >= 1:
+                self.AddFile(str(redist_canidates[0]), 'vc_redist.x64.exe')
+            else:
+                print('ERROR: Failed to find msvc redist installer!')
 
     def Deploy(self):
         with zipfile.ZipFile(self.__path, 'w') as zip_file:

@@ -1,6 +1,6 @@
 -- Lua utils for MoxPP
 -- 
--- Copyright (c) 2025 Ludwig Füchsl
+-- Copyright (c) 2025 Moxibyte GmbH
 -- 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal

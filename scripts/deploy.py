@@ -4,7 +4,7 @@ Add your own code to the main "function"
 
 The script is by default called with "Release" in the first argument
 
-Copyright (c) 2025 Ludwig Füchsl
+Copyright (c) 2025 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,8 +45,10 @@ if __name__ == '__main__':
     #       We do some quick example here
 
     # Simple zip archive with the software (dumb copy)
+    # Also add the msvc redists via "AddMSVCRedists" call (does nothing is not on windows!) 
     zipArchive = mox.MDZip(mox.AutomaticFilename("moxpp", version, conf, "zip"))
     zipArchive.AddFolder(f'./build/{arch}-{conf}/bin', '')
+    zipArchive.AddMSVCRedists()
     zipArchive.Deploy()
 
     # Source archive

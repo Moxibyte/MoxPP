@@ -59,6 +59,7 @@ The project provides the following actions. You can run them with the mox tool (
 - **build**: This command will build the project. Usage: `./mox.bat/sh build [conf]`.
 - **deploy**: This command will deploy a build. Usage: `./mox.bat/sh deploy [conf]`.
 - **clean**: This command will remove all regenerateable files of a certain category. Usage `./mox.bat/sh clean [type]` Where type can be (`output`, `project`, `dependencies`, or `all`. Defaults to `output`).
+- **archive**: This command will call git archive to generate a archive file of all committed changes into a dedicated ignored folder with timestamp. Usage `./mox.bat/sh archive` (no arguments supported).
 - **run**: This will automatically run a specific executable in the correct working dir. Usage `./mox.bat/sh run [-c=Debug/Release/...] EXE [args...]`.
 - **autogen**: Will automatically run `init`, `build` and `deploy`.
 - **graph**: Will generate a conan dependency-graph to a HTML file
