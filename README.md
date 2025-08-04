@@ -12,7 +12,7 @@ C++ Template Repository with Conan2 and Premake5 for Windows and Linux. Out of t
 ## Dependencies
 Before you are getting started make sure to install the following applications:
 - Python3
-- Conan2 (`pip install conan`) please use version `2.9.3` (it might work on newer version but conan2 changes a thing with every update!)
+- Conan2 (`pip install conan`) (tested on `2.18.1`)
 - Visual Studio (Windows)
 - build-essential (Linux)
 More information in [BUILDING.md](BUILDING.md)
