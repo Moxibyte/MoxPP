@@ -4,8 +4,8 @@ C++ Template Repository with Conan2 and Premake5 for Windows and Linux. Out of t
 **Please make sure to read the WHOLE readme and follow all instructions!**
 
 ## Important things to know
-- This project support cross compiling but only for the same os. I only tested `x86_64` to `arm64` (because this is the most likely usage of cross compiling)
-- The project support `x86`, `x86_64`, `ARM` and `ARM64` (please note that ARM and 32-Bit support is experimental and is currently not covered by any tests. Github runners only support x86_64. I have tested ARM64 on an OnLogic industrial RPi with am CM4 and it worked with no problems (manually compiled premake5). I'm also currently working on getting it compiling for an iMX91 target via WSL).
+- This project support cross compiling but only for the same os. I only tested `x86_64` to `arm64` (because this is the most likely usage of cross compiling. The binaries work on `arm64` chips like RPi CMs, iMX91/3)
+- The project support `x86`, `x86_64`, `ARM` and `ARM64` (Compiling from windows and linux for the respective systems has been test. Only plain `ARM` is not tests. However we do not unit-test any configuration other than 64bit).
 - **PLEASE NOTE THAT THERE IS NO PRECOMPILED BINARY OF PREMAKE FOR ARM BUILD SYSTEM!!! YOU NEED TO MANUALLY COMPILE AND COPY THE EXECUTABLE.**
 - The project uses GitHub Actions by default. Delete them if you don't want them. We will NOT cover any costs or results occurred because of actions or code shipped with this template! MIT Licenses also applies here!
 
