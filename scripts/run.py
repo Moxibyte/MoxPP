@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     if args.exe:
         exe = args.exe
-        exepath = f'build/{args.arch}-{conf}/bin/{exe}'
+        exepath = f'build/{arch}-{conf}/bin/{exe}'
         if sys.platform.startswith('linux'):
             exepath = '../' + exepath
         else:
