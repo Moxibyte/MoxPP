@@ -96,7 +96,7 @@ function mox_project(name, output_name)
         }
 
         -- GCC Prefix
-        if mox_is_windows() then
+        if not mox_is_windows() then
             filter { "system:not Windows" }
                 gccprefix (_OPTIONS["mox_gcc_prefix"])
             filter {}

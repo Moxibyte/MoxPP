@@ -43,6 +43,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+    - name: Install Cross-Compiler
+      run: apt-get install crossbuild-essential-arm64
     - name: Install python
       uses: actions/setup-python@v4
       with:
@@ -79,6 +81,21 @@ jobs:
         python-version: '3.12' 
     - name: MoxPP Init
       run: ./mox.bat init --arch x86_64
+    - name: MoxPP Build
+      run: ./mox.bat build
+
+  build_windows_arm64:
+    name: Build Windows arm64
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12' 
+    - name: MoxPP Init
+      run: ./mox.bat init --arch arm64
     - name: MoxPP Build
       run: ./mox.bat build
     

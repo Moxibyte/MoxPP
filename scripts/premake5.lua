@@ -57,7 +57,7 @@ newoption {
     value = "PREFIX",
     description = "GCC Prefix for cross compiling",
     category = "MoxPP",
-    default = ""
+    default = "none"
 }
 newoption {
     trigger = "mox_version",

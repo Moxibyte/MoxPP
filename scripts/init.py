@@ -128,7 +128,7 @@ if __name__ == '__main__':
         ))
 
     # GCC Prefix
-    gccPrefix = ''
+    gccPrefix = 'none'
     if sys.platform.startswith('linux'):
         gccPrefix = f'{mox.AdjustGccPrefix(arch)}-'
 
