@@ -35,6 +35,6 @@ if __name__ == '__main__':
     args = p.parse_args()
 
     # Autogen flow
-    subprocess.run((sys.executable, './scripts/mox.py', 'init', '--conf', args.conf, '--arch', args.arch))
+    subprocess.run((sys.executable, './scripts/mox.py', 'init', '--arch', args.arch))
     subprocess.run((sys.executable, './scripts/mox.py', 'build', '--conf', args.conf))
     subprocess.run((sys.executable, './scripts/mox.py', 'deploy', '--conf', args.conf, '--arch', args.arch))

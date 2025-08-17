@@ -37,7 +37,7 @@ if __name__ == '__main__':
     conf = args.conf
 
     # Init project
-    subprocess.run((sys.executable, './scripts/mox.py', 'init', '--conf', args.conf, '--arch', args.arch))
+    subprocess.run((sys.executable, './scripts/mox.py', 'init', '--arch', args.arch))
 
     # Build project
     subprocess.run((sys.executable, './scripts/mox.py', 'build', '--conf', args.conf))
