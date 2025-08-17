@@ -44,7 +44,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - name: Install Cross-Compiler
-      run: apt-get install crossbuild-essential-arm64
+      run: sudo apt-get install crossbuild-essential-arm64
     - name: Install python
       uses: actions/setup-python@v4
       with:
