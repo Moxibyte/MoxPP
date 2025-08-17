@@ -24,43 +24,32 @@ SOFTWARE.
 """
 import mox
 import sys
+import argparse
+import platform
 import subprocess
 
 if __name__ == '__main__':
-    argv_index = 1
+    p = argparse.ArgumentParser(prog="run.py", allow_abbrev=False)
+    p.add_argument("--conf", default="Release", help="Build configuration (default: Release)")
+    p.add_argument("--arch", default=platform.machine().lower(), help="Alternative (cross compile) architecture")
+    p.add_argument("exe", nargs="?", help="Executable name in build/{arch}-{conf}/bin")
+    args, passthrough = p.parse_known_args()
 
-    # Configuration
-    conf = 'Release'
-    if len(sys.argv) > argv_index:
-        if sys.argv[argv_index].startswith('-c='):
-            conf = sys.argv[argv_index][3::]
-            argv_index += 1
+    conf = args.conf
+    arch = mox.GetPlatformInfo(args.arch)["premake_arch"]
 
-    # Architecture
-    arch = mox.GetPlatformInfo()["premake_arch"]
-
-    if len(sys.argv) > argv_index:
-        # Executable name
-        exe = sys.argv[argv_index]
-        argv_index += 1
-
-        # Arguments
-        args = sys.argv[argv_index::]
-
-	    # Path to exe
-        exepath = f'build/{arch}-{conf}/bin/{exe}'
+    if args.exe:
+        exe = args.exe
+        exepath = f'build/{args.arch}-{conf}/bin/{exe}'
         if sys.platform.startswith('linux'):
             exepath = '../' + exepath
         else:
             exepath = './' + exepath
 
-        # Run executable
         returncode = subprocess.run(
-            (exepath, *args), 
+            (exepath, *passthrough),
             cwd='./app'
         ).returncode
-
-        # Exit with code
         sys.exit(returncode)
     else:
         print('No executable provided!')

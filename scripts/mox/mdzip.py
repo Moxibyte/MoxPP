@@ -1,5 +1,5 @@
 """
-MDZip - MoxPP Deploy 
+MDZip - MoxPP Deploy
 Packes into a zip file
 
 Copyright (c) 2025 Moxibyte GmbH

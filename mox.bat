@@ -1,4 +1,13 @@
 @echo off
-REM Windows script for calling mox.py
-python ./scripts/mox.py %*
+REM Windows launcher for mox.py using isolated venv in /venv/venv/
+
+REM Ensure the venv exists and requirements are installed
+python venv\venv.py
+IF %ERRORLEVEL% NEQ 0 exit /b %ERRORLEVEL%
+
+REM Add venv Scripts folder to PATH
+SET "PATH=%~dp0venv\venv\Scripts;%PATH%"
+
+REM Run the script with venv python
+venv\venv\Scripts\python.exe scripts\mox.py %*
 exit /b %errorlevel%

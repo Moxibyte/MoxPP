@@ -26,11 +26,13 @@ import mox
 import moxwin
 
 import os
+import re
 import sys
 import stat
 import zipfile
 import tarfile
 import platform
+import argparse
 import subprocess
 import urllib.request
 
@@ -74,29 +76,41 @@ def DownloadPremake(version = '5.0.0-beta4'):
                 tarFile.extractall(premakeTargetFolder, filter=tarfile.data_filter)
             os.chmod(premakeTargetExe, os.stat(premakeTargetExe).st_mode | stat.S_IEXEC)
 
-def ConanBuild(conf, arch):
+def ConanBuild(conf, host_profile, build_profile):
     return (
-        'conan', 'install', '.', 
-        '--build', 'missing', 
-        '--output-folder=./dependencies', 
-        '--deployer=full_deploy', 
-        f'--settings=arch={arch}',
-        f'--settings=build_type={conf}',
-        '--settings=compiler.cppstd=23',
+        'conan', 'install', '.',
+        '--build', 'missing',
+        f'--profile:host=./profiles/{host_profile}',
+        f'--profile:build=./profiles/{build_profile}',
+        f'--output-folder=./dependencies',
+        f'--deployer=full_deploy',
+        f'--settings=build_type={conf}'
     )
 
 if __name__ == '__main__':
-    # Conan skip evaluation
-    skipConan = False
-    if len(sys.argv) > 1 and sys.argv[1] == 'skip_conan':
-        skipConan = True
+    # Cli
+    p = argparse.ArgumentParser(prog="init.py", allow_abbrev=False)
+    p.add_argument("--skip-conan", action="store_true", help="Skip Conan evaluation")
+    p.add_argument("--arch", default=platform.machine().lower(), help="Alternative (cross compile) architecture")
+    args = p.parse_args()
+
+    skipConan = args.skip_conan
+    arch = args.arch
+
+    # Generate conan profiles
+    os.makedirs("./profiles/", exist_ok=True)
+    cpp_version = re.search(r'(\d+)', mox.ExtractLuaDef("./mox.lua", "cmox_cpp_version")).group(1)
+    mox.ProfileGen("./profiles/build", platform.machine().lower(), cpp_version)
+    mox.ProfileGen(f"./profiles/host_{arch}", arch, cpp_version)
 
     # Download tool applications
     DownloadPremake()
 
     # Get system architecture
-    arch = mox.GetPlatformInfo()
-    print(f'Generating project on { platform.machine().lower() } for conan={ arch["conan_arch"] } and premake={arch["premake_arch"]}')
+    buildArch = mox.GetThisPlatformInfo()
+    hostArch = mox.GetPlatformInfo(arch)
+    print(f'Generating project on { platform.machine().lower() } (conan={ buildArch["conan_arch"] } and premake={buildArch["premake_arch"]})')
+    print(f'for {arch} (conan={ hostArch["conan_arch"] } and premake={hostArch["premake_arch"]})')
 
     # Version detection
     version = mox.GetAppVersion()
@@ -104,21 +118,33 @@ if __name__ == '__main__':
 
     # Generate conan project
     if not skipConan:
-        subprocess.run(ConanBuild('Debug', arch["conan_arch"]))
-        subprocess.run(ConanBuild('Release', arch["conan_arch"]))
+        subprocess.run(ConanBuild('Debug', f'host_{arch}', 'build'))
+        subprocess.run(ConanBuild('Release', f'host_{arch}', 'build'))
         # Copy conan dlls
         subprocess.run((
-            sys.executable, 
-            './scripts/copydlls.py'
+            sys.executable,
+            './scripts/copydlls.py',
+            arch
         ))
 
     # Run premake5
     premakeGenerator = GetPremakeGenerator()
-    subprocess.run((
-        './dependencies/premake5/premake5', 
-        f'--mox_conan_arch={ arch["conan_arch"] }',
-        f'--mox_premake_arch={ arch["premake_arch"] }',
-        f'--mox_version={ version }',
-        '--file=./scripts/premake5.lua', 
-        premakeGenerator
-    ))
+    if sys.platform.startswith('linux'):
+        subprocess.run((
+            './dependencies/premake5/premake5',
+            f'--mox_conan_arch={ hostArch["conan_arch"] }',
+            f'--mox_premake_arch={ hostArch["premake_arch"] }',
+            f'--mox_gcc_prefix={ mox.AdjustGccPrefix(arch) }-',
+            f'--mox_version={ version }',
+            '--file=./scripts/premake5.lua',
+            premakeGenerator
+        ))
+    else:
+        subprocess.run((
+            './dependencies/premake5/premake5',
+            f'--mox_conan_arch={ hostArch["conan_arch"] }',
+            f'--mox_premake_arch={ hostArch["premake_arch"] }',
+            f'--mox_version={ version }',
+            '--file=./scripts/premake5.lua',
+            premakeGenerator
+        ))

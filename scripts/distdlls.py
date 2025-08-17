@@ -22,9 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import sys
-import platform
-import hashlib
 import shutil
+import hashlib
+import platform
+import argparse
 from pathlib import Path
 
 def file_hash(path):
@@ -35,12 +36,13 @@ def file_hash(path):
     return h.hexdigest()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} <src> <dst>")
-        sys.exit(1)
+    p = argparse.ArgumentParser(prog="distdlls.py", allow_abbrev=False)
+    p.add_argument("src", help="Source path")
+    p.add_argument("dst", help="Destination path")
+    args = p.parse_args()
 
-    src = Path(sys.argv[1])
-    dst = Path(sys.argv[2])
+    src = Path(args.src)
+    dst = Path(args.dst)
 
     if not src.is_dir():
         print(f"Error: Source directory '{src}' does not exist.")

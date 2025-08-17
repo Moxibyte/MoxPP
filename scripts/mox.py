@@ -2,7 +2,7 @@
 Root mox.py script
 This will automatically call other scripts with the mox.bat / mox.sh / mox.py shortcut
 
-Copyright (c) 2024 Moxibyte GmbH
+Copyright (c) 2025 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ SOFTWARE.
 import os
 import sys
 import os.path
+import argparse
 import subprocess
 
 def ScriptPath(script):
@@ -33,18 +34,15 @@ def ScriptPath(script):
 
 if __name__ == '__main__':
     # Process arguments
-    args = sys.argv
-    if len(args) > 1:
-        script = args[1]
-        args = args[2::]
-    else:
-        script = 'autogen'
-        args = []    
+    p = argparse.ArgumentParser(prog="mox.py", allow_abbrev=False)
+    p.add_argument("script", nargs="?", default="autogen", help="Script name without .py")
+    args, passthrough = p.parse_known_args()
+
 
     # Validate script
-    path = ScriptPath(script)
+    path = ScriptPath(args.script)
     if os.path.isfile(path):
-        returncode = subprocess.run((sys.executable, path, *args)).returncode
+        returncode = subprocess.run((sys.executable, path, *passthrough)).returncode
         sys.exit(returncode)
     else:
         print(f'Script "{script}" not found!')
@@ -53,3 +51,4 @@ if __name__ == '__main__':
         for file in os.listdir(os.path.dirname(os.path.abspath(__file__))):
             if file.endswith('.py') and file != 'mox.py':
                 print(f'- {file[0:-3]}')
+        sys.exit(-1)

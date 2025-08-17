@@ -1,17 +1,17 @@
 -- premake5.lua root script
--- 
+--
 -- Copyright (c) 2025 Moxibyte GmbH
--- 
+--
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
 -- in the Software without restriction, including without limitation the rights
 -- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 -- copies of the Software, and to permit persons to whom the Software is
 -- furnished to do so, subject to the following conditions:
--- 
+--
 -- The above copyright notice and this permission notice shall be included in all
 -- copies or substantial portions of the Software.
--- 
+--
 -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 -- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 -- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -53,6 +53,13 @@ newoption {
     default = "x86_64"
 }
 newoption {
+    trigger = "mox_gcc_prefix",
+    value = "PREFIX",
+    description = "GCC Prefix for cross compiling",
+    category = "MoxPP",
+    default = ""
+}
+newoption {
     trigger = "mox_version",
     value = "VERSION",
     description = "Set the version string injected as preprocessor macro",
@@ -77,16 +84,16 @@ workspace(cmox_product_name)
         include(hmox_project_dir .. "build.lua")
     elseif cmox_project_architecture == "flat" then
         for dir in mox_discover_subfolders("../" .. cmox_src_folder)
-        do 
-            hmox_project_dir = "../" .. cmox_src_folder .. "/" .. dir .. "/" 
-            local buildFile = hmox_project_dir .. "build.lua" 
+        do
+            hmox_project_dir = "../" .. cmox_src_folder .. "/" .. dir .. "/"
+            local buildFile = hmox_project_dir .. "build.lua"
             if os.isfile(buildFile) then
                 include(buildFile)
             end
         end
     elseif cmox_project_architecture == "hierarchical" then
         for dir in mox_discover_subfolders("../" .. cmox_src_folder)
-        do 
+        do
             group(dir)
             for subdir in mox_discover_subfolders("../" .. cmox_src_folder .. "/" .. dir)
             do
@@ -104,4 +111,4 @@ workspace(cmox_product_name)
     -- Unittest
     if cmox_unit_test_src ~= nil then
         include("../" .. cmox_unit_test_src .. "/build.lua")
-    end 
+    end

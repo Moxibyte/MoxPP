@@ -28,29 +28,29 @@ import mox
 import os
 import sys
 import zipfile
+import argparse
 
 if __name__ == '__main__':
     # Configuration for the build
-    conf = 'Release'
-    if len(sys.argv) > 1:
-        conf = sys.argv[1]
+    p = argparse.ArgumentParser(prog="deploy.py", allow_abbrev=False)
+    p.add_argument("--conf", default="Release", help="Build configuration (default: Release)")
+    p.add_argument("--arch", default=platform.machine().lower(), help="Alternative (cross compile) architecture")
+    args = p.parse_args()
 
-    # Version detection
+    # Detect version and architecture
     version = mox.GetAppVersion()
-
-    # Architecture
-    arch = mox.GetPlatformInfo()["premake_arch"]
+    arch = mox.GetPlatformInfo(args.arch)["premake_arch"]
 
     # TODO: Add your own implementation
     #       We do some quick example here
 
     # Simple zip archive with the software (dumb copy)
-    # Also add the msvc redists via "AddMSVCRedists" call (does nothing is not on windows!) 
-    zipArchive = mox.MDZip(mox.AutomaticFilename("moxpp", version, conf, "zip"))
-    zipArchive.AddFolder(f'./build/{arch}-{conf}/bin', '')
+    # Also add the msvc redists via "AddMSVCRedists" call (does nothing is not on windows!)
+    zipArchive = mox.MDZip(mox.AutomaticFilename("moxpp", version, f'{args.arch}-{args.conf}', "zip"))
+    zipArchive.AddFolder(f'./build/{args.arch}-{args.conf}/bin', '')
     zipArchive.AddMSVCRedists()
     zipArchive.Deploy()
 
     # Source archive
-    srcArchive = mox.MDSrc(mox.AutomaticFilename("moxpp_src", version, conf, "zip"))
+    srcArchive = mox.MDSrc(mox.AutomaticFilename("moxpp_src", version, f'{args.arch}-{args.conf}', "zip"))
     srcArchive.Deploy()

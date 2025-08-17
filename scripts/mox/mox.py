@@ -22,8 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import os
+import re
+import pathlib
 import platform
 import datetime
+import subprocess
 
 MOX_ARCH_MAP = {
     # x86 32bit
@@ -38,7 +41,7 @@ MOX_ARCH_MAP = {
     # ARM (32bit)
     "arm":          { "conan_arch": "armv7",    "premake_arch": "ARM" },        # Seen on linux
 
-    # ARM64 
+    # ARM64
     "arm64":        { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on windows
     "aarch64":      { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
     "aarch64_be":   { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
@@ -46,8 +49,11 @@ MOX_ARCH_MAP = {
     "armv8l":       { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
 }
 
-def GetPlatformInfo():
-    arch = platform.machine().lower()
+def GetThisPlatformInfo():
+    return GetPlatformInfo(platform.machine())
+
+def GetPlatformInfo(arch):
+    arch = arch.lower()
     if not arch in MOX_ARCH_MAP:
         raise ValueError(f'Architecture "{arch}" is not supported by MoxPP!')
     return MOX_ARCH_MAP[arch]
@@ -56,7 +62,7 @@ def GetFilename(product, version, system, conf, arch, extension):
     return f'{product}-{version}-{system}-{conf}-{arch}.{extension}' # project_name-1.0.0-Windows-Release-x86_64.zip
 
 def AutomaticFilename(product, version, conf, extension):
-    return GetFilename(product, version, platform.system(), conf, GetPlatformInfo()["premake_arch"], extension)
+    return GetFilename(product, version, platform.system(), conf, GetThisPlatformInfo()["premake_arch"], extension)
 
 def GetAppVersion(default=""):
     version = os.environ.get("MOXPP_VERSION")
@@ -65,3 +71,15 @@ def GetAppVersion(default=""):
             return default
         return f"0.0.0+dev.{ datetime.datetime.now().strftime('%Y%m%d') }"
     return version
+
+def ExtractLuaDef(filepath, variable):
+    text = pathlib.Path(filepath).read_text(encoding="utf-8")
+    pattern = rf'^\s*{re.escape(variable)}\s*=\s*(["\'])(.*?)\1'
+    m = re.search(pattern, text, flags=re.MULTILINE)
+    return m.group(2) if m else None
+
+def GetGccPrefix():
+    return subprocess.check_output(["g++", "-dumpmachine"], text=True).strip().partition('-')[2]
+
+def AdjustGccPrefix(arch):
+    return f"{arch}-{GetGccPrefix()}"

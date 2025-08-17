@@ -1,17 +1,17 @@
 -- Lua utils for MoxPP
--- 
+--
 -- Copyright (c) 2025 Moxibyte GmbH
--- 
+--
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
 -- in the Software without restriction, including without limitation the rights
 -- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 -- copies of the Software, and to permit persons to whom the Software is
 -- furnished to do so, subject to the following conditions:
--- 
+--
 -- The above copyright notice and this permission notice shall be included in all
 -- copies or substantial portions of the Software.
--- 
+--
 -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 -- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 -- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -95,6 +95,11 @@ function mox_project(name, output_name)
             cmox_macro_prefix .. "VERSION=\"" .. _OPTIONS["mox_version"] .. "\"",
         }
 
+        -- GCC Prefix
+        filter { "system:not Windows" }
+            gccprefix (_OPTIONS["mox_gcc_prefix"])
+        filter {}
+
         -- Debug / Release
         for idx,conf in pairs(cmox_configurations_n) do
             local is_debug = cmox_configurations_d[idx]
@@ -103,13 +108,13 @@ function mox_project(name, output_name)
                     cmox_macro_prefix .. conf:upper()
                 }
                 if is_debug then
-                    defines { 
+                    defines {
                         "DEBUG",
                         cmox_macro_prefix .. "DEBUG",
                     }
                     symbols "On"
                 else
-                    defines { 
+                    defines {
                         "NDEBUG",
                         cmox_macro_prefix .. "NDEBUG",
                     }
@@ -117,7 +122,7 @@ function mox_project(name, output_name)
                 end
             filter {}
         end
-  
+
         -- Define: OS
         filter { "system:windows" }
             defines {
@@ -166,12 +171,12 @@ function mox_project(name, output_name)
         if cmox_copy_dlls then
             for idx,conf in pairs(cmox_configurations_n) do
                 local is_debug = cmox_configurations_d[idx]
-                
+
                 filter { "configurations:" .. conf, "kind:ConsoleApp or WindowedApp" }
                     if is_debug then
-                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Debug %{cfg.targetdir}")
+                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Debug-%{cfg.architecture} %{cfg.targetdir}")
                     else
-                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Release %{cfg.targetdir}")
+                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Release-%{cfg.architecture} %{cfg.targetdir}")
                     end
                 filter {}
             end
@@ -197,25 +202,21 @@ function mox_cs(dotnet)
     if dotnet==nil then
         dotnet = "4.6"
     end
-    
+
     language "C#"
     dotnetframework(dotnet)
 end
 function mox_cpp(cppstd)
-    if cppstd==nil then
-        cppstd = "C++23"
-    end
-    
     language "C++"
-    cppdialect(cppstd)
+    cppdialect(cmox_cpp_version)
 
     mox_add_conan_building()
 end
 function mox_console()
     kind "ConsoleApp"
     defines {
-        cmox_macro_prefix .. "APP", 
-        cmox_macro_prefix .. "CONSOLE", 
+        cmox_macro_prefix .. "APP",
+        cmox_macro_prefix .. "CONSOLE",
     }
     linkgroups "On"
     mox_add_conan_linking()
@@ -223,7 +224,7 @@ end
 function mox_windowed()
     kind "WindowedApp"
     defines {
-        cmox_macro_prefix .. "APP", 
+        cmox_macro_prefix .. "APP",
         cmox_macro_prefix .. "WINDOWED",
     }
     linkgroups "On"
@@ -274,9 +275,9 @@ function mox_add_conan_itterate(func)
         local is_debug = cmox_configurations_d[idx]
         filter { "configurations:" .. conf }
             if is_debug then
-                func("debug_" .. _OPTIONS["mox_conan_arch"])
+                func("debug_" .. _OPTIONS["mox_premake_arch"]:lower())
             else
-                func("release_" .. _OPTIONS["mox_conan_arch"])
+                func("release_" .. _OPTIONS["mox_premake_arch"]:lower())
             end
         filter {}
     end

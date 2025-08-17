@@ -1,12 +1,12 @@
 """
-Cleans all relevant files 
+Cleans all relevant files
 Multiple modes:
 - "output" (default): Removes the build directory
 - "project": Removes all visual studio files / Makefiles
 - "dependencies": Removes the external downloaded dependencies (not the conan cache)
-- "all": All above steps 
+- "all": All above steps
 
-Copyright (c) 2023 Moxibyte GmbH
+Copyright (c) 2025 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ SOFTWARE.
 import os
 import sys
 import shutil
+import argparse
 
 def RecursiveRemove(root_dir, extensions_to_remove = (), exclude_subdirs = ()):
     for content in os.listdir(root_dir):
@@ -54,23 +55,25 @@ def CleanDependencies():
 def CleanProject():
     shutil.rmtree('./vs', ignore_errors=True)
     RecursiveRemove(
-        './', 
+        './',
         ('.sln', '.vcxproj', '.vcxproj.user', '.vcxproj.filters', 'Makefile'),
         ('.git', '.vs', 'app', 'build', 'dependencies', 'scripts')
     )
 
 if __name__ == '__main__':
     # Get mode from cli
-    mode = 'output'
-    if len(sys.argv) > 1:
-        mode = sys.argv[1]
+    p = argparse.ArgumentParser(prog="clean.py", allow_abbrev=False)
+    p.add_argument("mode", nargs="?", default="output",
+                   choices=["output", "project", "dependencies", "all"],
+                   help="Clean mode (default: output)")
+    args = p.parse_args()
 
     # Select mode
-    if mode == 'output':
+    if args.mode == 'output':
         CleanOutput()
-    elif mode == 'project':
+    elif args.mode == 'project':
         CleanProject()
-    elif mode == 'dependencies':
+    elif args.mode == 'dependencies':
         CleanDependencies()
     elif mode == 'all':
         CleanOutput()

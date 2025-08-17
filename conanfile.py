@@ -10,7 +10,7 @@ class MoxPPRecipe(ConanFile):
 
         # This is required for unit testing! Only remove it when not using unit tests!
         # You can also swap the testing framework. There is no hard reference to gtest in MoxPP!
-        self.requires("gtest/1.15.0") 
+        self.requires("gtest/1.15.0")
 
     def configure(self):
         # We set spdlog to be shared lib. This is only done for testing the mechanisms of dll copying in ci

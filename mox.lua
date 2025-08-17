@@ -8,16 +8,20 @@ cmox_product_name = "MoxPP"
 
 -- CONFIGURATIONS
 -- The first array _n are the configuration names
--- The second array _d are the configuration debug flags 
+-- The second array _d are the configuration debug flags
 -- (use true on all debugging configurations)
-cmox_configurations_n = { 
-    "Debug",  
-    "Release",   
+cmox_configurations_n = {
+    "Debug",
+    "Release",
 }
-cmox_configurations_d = { 
+cmox_configurations_d = {
     true,
     false,
 }
+
+-- CPPVERSION
+-- Defines the c++ version
+cmox_cpp_version = "C++23"
 
 -- SOURCE FOLDER NAME
 cmox_src_folder = "src"
@@ -29,18 +33,18 @@ cmox_src_folder = "src"
 --
 -- "flat"           The hirarch of the project is flat.
 --                  build.lua files will be loaded from from
---                  subdirs of the src folder. Each dir can 
---                  be a project.      
--- 
+--                  subdirs of the src folder. Each dir can
+--                  be a project.
+--
 -- "hierarchical"   Adds one more indirection layer to the
---                  "flat" architecture. The first folder 
+--                  "flat" architecture. The first folder
 --                  will be the group name. Groups are treatet
 --                  similar to the flat modell
 --
 -- "manual"         Projects are not loaded by the MoxPP
 --                  provide the "cmox_function_includeprojects"
 --                  function.
-cmox_project_architecture = "single" 
+cmox_project_architecture = "single"
 
 -- DLL DISTRIBUTING
 -- When enabled, dlls will be copied as a postbuild-step to the output directory
@@ -52,7 +56,7 @@ cmox_macro_prefix = "MOXPP_"
 
 -- UNITTEST
 -- This defines where to find the unit test code.
--- You can set this to nil. When set to nil no test will be configured. 
+-- You can set this to nil. When set to nil no test will be configured.
 -- You can delete the default test folder then
 cmox_unit_test_src = "test"
 
@@ -69,7 +73,7 @@ cmox_unit_test_src = "test"
 --     ...
 -- end
 
--- This function is called in manual configuration to include 
+-- This function is called in manual configuration to include
 -- the project
 -- use: include "my-build-file.lua"
 -- function cmox_function_includeprojects()

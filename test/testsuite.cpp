@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-TEST(TestSuite, ExampleTest) 
+TEST(TestSuite, ExampleTest)
 {
     EXPECT_EQ(1 + 1, 2);
 }

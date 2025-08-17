@@ -27,7 +27,7 @@ import subprocess
 
 def GetCodepage():
     return "".join(filter(str.isalnum, subprocess.getoutput('chcp').split(':')[-1].strip()))
-    
+
 def FindLatestVisualStudio():
     vswhere = os.getenv('programfiles(x86)') + '\\Microsoft Visual Studio\\Installer\\vswhere.exe'
     out = subprocess.check_output((vswhere, '-latest', '-nocolor', '-format', 'json'))
@@ -44,4 +44,3 @@ def GetVisualStudioYearNumber(vswhere):
 
 def GetVisualStudioPath(vswhere):
     return vswhere[0]['installationPath']
-

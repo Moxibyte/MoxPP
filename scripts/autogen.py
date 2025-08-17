@@ -2,7 +2,7 @@
 Automatic generation script
 Will completely setup, build and deploy your project
 
-Copyright (c) 2023 Moxibyte GmbH
+Copyright (c) 2025 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import sys
+import argparse
 import subprocess
 
 if __name__ == '__main__':
     # Configuration
-    conf = 'Release'
-    if len(sys.argv) > 1:
-        conf = sys.argv[1]
+    p = argparse.ArgumentParser(prog="autogen.py", allow_abbrev=False)
+    p.add_argument("--conf", default="Release", help="Build configuration (default: Release)")
+    p.add_argument("--arch", default=platform.machine().lower(), help="Alternative (cross compile) architecture")
+    args = p.parse_args()
 
-    # Init project
-    subprocess.run((sys.executable, './scripts/mox.py', 'init'))
-
-    # Build project
-    subprocess.run((sys.executable, './scripts/mox.py', 'build', conf))
-
-    # Deploy project
-    subprocess.run((sys.executable, './scripts/mox.py', 'deploy', conf))
+    # Autogen flow
+    subprocess.run((sys.executable, './scripts/mox.py', 'init', '--conf', args.conf, '--arch', args.arch))
+    subprocess.run((sys.executable, './scripts/mox.py', 'build', '--conf', args.conf))
+    subprocess.run((sys.executable, './scripts/mox.py', 'deploy', '--conf', args.conf, '--arch', args.arch))

@@ -1,6 +1,5 @@
 """
-MDZip - MoxPP Deploy
-Packes sources into a zip file
+Setup of python venv
 
 Copyright (c) 2025 Moxibyte GmbH
 
@@ -23,17 +22,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import os
+import sys
+import pathlib
 import subprocess
 
-class MDSrc:
-    def __init__(self, filename, deployDir='./deploy'):
-        os.makedirs(deployDir, exist_ok=True)
-        self.__path =  deployDir + "/" + filename
+if __name__ == '__main__':
+    base_dir = pathlib.Path(__file__).parent
+    venv_dir = base_dir / 'venv'
+    python_bin = venv_dir / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
 
-    def Deploy(self):
-        subprocess.run((
-            'git', 'archive',
-            '--format=zip',
-            f'--output={ self.__path }',
-            'HEAD',
+    # Create venv
+    if not python_bin.exists():
+        subprocess.check_call((
+            sys.executable,
+            '-m',
+            'venv',
+            str(venv_dir)
+        ))
+
+        # Install requirements
+        requirements = base_dir / 'requirements.txt'
+        subprocess.check_call((
+            str(python_bin),
+            '-m',
+            'pip',
+            'install',
+            '-r',
+            str(requirements)
         ))

@@ -22,12 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import os
+import mox
 import shutil
 import platform
+import argparse
 from pathlib import Path
 
 
-def copy_binaries(source_root, debug_dest, release_dest):
+def copy_binaries(source_root, debug_dest, release_dest, conan_arch):
     source_root = Path(source_root).resolve()
     debug_dest = Path(debug_dest).resolve()
     release_dest = Path(release_dest).resolve()
@@ -52,15 +54,9 @@ def copy_binaries(source_root, debug_dest, release_dest):
             if not build_path.exists():
                 continue
 
-            # Find the platform subdirectory (assuming only one exists)
-            platforms = list(build_path.iterdir())
-            if len(platforms) != 1:
-                print(f"Skipping {lib_dir}, expected exactly one platform directory but found {len(platforms)}")
-                continue
-
             dll_dirs = ( "bin", "lib" )
             for dll_dir in dll_dirs:
-                platform_path = platforms[0] / dll_dir
+                platform_path = build_path / conan_arch / dll_dir
                 if platform_path.exists():
                     dest_dir = debug_dest if build_type == "Debug" else release_dest
                     dest_dir.mkdir(parents=True, exist_ok=True)
@@ -71,9 +67,18 @@ def copy_binaries(source_root, debug_dest, release_dest):
                         print(f"Copied {binary_file} -> {dest_file}")
 
 if __name__ == "__main__":
+    # Cli
+    p = argparse.ArgumentParser(prog="copydlls.py", allow_abbrev=False)
+    p.add_argument("arch", nargs="?", default=platform.machine().lower(), help="Alternative (cross compile) architecture")
+    args = p.parse_args()
+
+
+    # Resolve architecture
+    hostArch = mox.GetPlatformInfo(args.arch)
+
     # Example usage
     source_directory = "./dependencies/full_deploy"
-    debug_output_directory = "./dlls/Debug"
-    release_output_directory = "./dlls/Release"
-    
-    copy_binaries(source_directory, debug_output_directory, release_output_directory)              
+    debug_output_directory = f"./dlls/Debug-{hostArch['premake_arch']}"
+    release_output_directory = f"./dlls/Release-{hostArch['premake_arch']}"
+
+    copy_binaries(source_directory, debug_output_directory, release_output_directory, hostArch["conan_arch"])

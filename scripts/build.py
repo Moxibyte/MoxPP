@@ -26,6 +26,7 @@ import moxwin
 
 import sys
 import glob
+import argparse
 import subprocess
 
 def WindowsBuild(conf):
@@ -43,7 +44,7 @@ def WindowsBuild(conf):
     # Run build
     subprocess.run((
         msbuild, slnFiles[0],
-        f'-p:Configuration={conf}' 
+        f'-p:Configuration={conf}'
     ))
 
 def LinuxBuild(conf):
@@ -54,12 +55,12 @@ def LinuxBuild(conf):
 
 if __name__ == '__main__':
     # Configuration from cli
-    conf = 'Release'
-    if len(sys.argv) > 1:
-        conf = sys.argv[1]
+    p = argparse.ArgumentParser(prog="build.py", allow_abbrev=False)
+    p.add_argument("--conf", default="Release", help="Build configuration (default: Release)")
+    args = p.parse_args()
 
     # Run build step
     if sys.platform.startswith('linux'):
-        LinuxBuild(conf)
+        LinuxBuild(args.conf)
     else:
-        WindowsBuild(conf)
+        WindowsBuild(args.conf)

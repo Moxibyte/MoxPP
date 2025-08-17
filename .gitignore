@@ -1,6 +1,9 @@
 # Python caches
 **__pycache__**
 
+# Conan profiles
+/profiles
+
 # Dependency output
 /dependencies
 /dlls
