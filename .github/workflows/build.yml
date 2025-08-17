@@ -8,7 +8,7 @@ on:
   
 jobs:
   build_linux_32bit:
-    name: Build Linux
+    name: Build Linux i686
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -23,7 +23,7 @@ jobs:
       run: ./mox.sh build
 
   build_linux_64bit:
-    name: Build Linux
+    name: Build Linux x86_64
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -36,9 +36,24 @@ jobs:
       run: ./mox.sh init --arch x86_64
     - name: MoxPP Build
       run: ./mox.sh build
+
+  build_linux_aarch64:
+    name: Build Linux aarch64
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12' 
+    - name: MoxPP Init
+      run: ./mox.sh init --arch aarch64
+    - name: MoxPP Build
+      run: ./mox.sh build
      
   build_windows_32bit:
-    name: Build Windows
+    name: Build Windows x86
     runs-on: windows-latest
     steps:
     - name: Checkout
@@ -53,7 +68,7 @@ jobs:
       run: ./mox.bat build
 
   build_windows_64bit:
-    name: Build Windows
+    name: Build Windows x86_64
     runs-on: windows-latest
     steps:
     - name: Checkout

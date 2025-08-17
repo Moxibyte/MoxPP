@@ -96,9 +96,11 @@ function mox_project(name, output_name)
         }
 
         -- GCC Prefix
-        filter { "system:not Windows" }
-            gccprefix (_OPTIONS["mox_gcc_prefix"])
-        filter {}
+        if mox_is_windows() then
+            filter { "system:not Windows" }
+                gccprefix (_OPTIONS["mox_gcc_prefix"])
+            filter {}
+        end
 
         -- Debug / Release
         for idx,conf in pairs(cmox_configurations_n) do
