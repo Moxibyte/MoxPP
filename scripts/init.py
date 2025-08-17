@@ -127,24 +127,19 @@ if __name__ == '__main__':
             arch
         ))
 
+    # GCC Prefix
+    gccPrefix = ''
+    if sys.platform.startswith('linux'):
+        gccPrefix = f'{mox.AdjustGccPrefix(arch)}-'
+
     # Run premake5
     premakeGenerator = GetPremakeGenerator()
-    if sys.platform.startswith('linux'):
-        subprocess.run((
-            './dependencies/premake5/premake5',
-            f'--mox_conan_arch={ hostArch["conan_arch"] }',
-            f'--mox_premake_arch={ hostArch["premake_arch"] }',
-            f'--mox_gcc_prefix={ mox.AdjustGccPrefix(arch) }-',
-            f'--mox_version={ version }',
-            '--file=./scripts/premake5.lua',
-            premakeGenerator
-        ))
-    else:
-        subprocess.run((
-            './dependencies/premake5/premake5',
-            f'--mox_conan_arch={ hostArch["conan_arch"] }',
-            f'--mox_premake_arch={ hostArch["premake_arch"] }',
-            f'--mox_version={ version }',
-            '--file=./scripts/premake5.lua',
-            premakeGenerator
-        ))
+    subprocess.run((
+        './dependencies/premake5/premake5',
+        f'--mox_conan_arch={ hostArch["conan_arch"] }',
+        f'--mox_premake_arch={ hostArch["premake_arch"] }',
+        f'--mox_gcc_prefix={ gccPrefix }',
+        f'--mox_version={ version }',
+        '--file=./scripts/premake5.lua',
+        premakeGenerator
+    ))

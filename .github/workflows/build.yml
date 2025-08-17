@@ -7,7 +7,7 @@ on:
     branches: [ main ]
   
 jobs:
-  build_linux:
+  build_linux_32bit:
     name: Build Linux
     runs-on: ubuntu-latest
     steps:
@@ -18,11 +18,26 @@ jobs:
       with:
         python-version: '3.12' 
     - name: MoxPP Init
-      run: ./mox.sh init
+      run: ./mox.sh init --arch i686
+    - name: MoxPP Build
+      run: ./mox.sh build
+
+  build_linux_64bit:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12' 
+    - name: MoxPP Init
+      run: ./mox.sh init --arch x86_64
     - name: MoxPP Build
       run: ./mox.sh build
      
-  build_windows:
+  build_windows_32bit:
     name: Build Windows
     runs-on: windows-latest
     steps:
@@ -33,7 +48,22 @@ jobs:
       with:
         python-version: '3.12' 
     - name: MoxPP Init
-      run: ./mox.bat init
+      run: ./mox.bat init --arch x86
+    - name: MoxPP Build
+      run: ./mox.bat build
+
+  build_windows_64bit:
+    name: Build Windows
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12' 
+    - name: MoxPP Init
+      run: ./mox.bat init --arch x86_64
     - name: MoxPP Build
       run: ./mox.bat build
     
