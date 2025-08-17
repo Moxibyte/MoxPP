@@ -24,6 +24,7 @@ SOFTWARE.
 """
 import sys
 import argparse
+import platform
 import subprocess
 
 if __name__ == '__main__':

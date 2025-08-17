@@ -28,6 +28,7 @@ import mox
 import os
 import sys
 import zipfile
+import platform
 import argparse
 
 if __name__ == '__main__':
