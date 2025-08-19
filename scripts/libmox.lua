@@ -189,6 +189,11 @@ function mox_project(name, output_name)
             linkoptions { "/IGNORE:4099" }
         end
 
+        -- Fast compile
+        flags {
+            "MultiProcessorCompile",
+        }
+
         -- Custom project configuration
         if cmox_function_setupproject~=nil then
             cmox_function_setupproject()
