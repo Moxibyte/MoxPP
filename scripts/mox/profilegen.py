@@ -84,7 +84,8 @@ class INIProfileGen:
 
 def ProfileGen(path: str, architecture: str, cppversion: str):
     is_windows = platform.system().lower() == "windows"
-    arch = mox.GetPlatformInfo(architecture)["conan_arch"]
+    platformInfo = mox.GetPlatformInfo(architecture)
+    arch = platformInfo["conan_arch"]
 
     gen = INIProfileGen(path, arch, platform.system())
     if is_windows:
@@ -96,4 +97,4 @@ def ProfileGen(path: str, architecture: str, cppversion: str):
         gcc_version = subprocess.check_output(("g++", "-dumpversion"), text=True).strip()
         gen.AddGcc(cppversion, gcc_version, "libstdc++11")
         if architecture.lower() != platform.machine().lower():
-            gen.AddGccCrossLink(mox.AdjustGccPrefix(architecture.lower()))
+            gen.AddGccCrossLink(platformInfo["gcc_linux_prefix"])
