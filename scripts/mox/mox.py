@@ -30,23 +30,24 @@ import subprocess
 
 MOX_ARCH_MAP = {
     # x86 32bit
-    "i386":         { "conan_arch": "x86",      "premake_arch": "x86" },        # Seen on linux
-    "i686":         { "conan_arch": "x86",      "premake_arch": "x86" },        # Seen on linux
-    "x86":          { "conan_arch": "x86",      "premake_arch": "x86" },        # Seen on windows
+    "i386":         { "conan_arch": "x86",      "premake_arch": "x86",      "gcc_linux_prefix": "x86_64-linux-gnu",         "gcc_windows_prefix": "i686-w64-mingw32" },     # Seen on linux
+    "i686":         { "conan_arch": "x86",      "premake_arch": "x86",      "gcc_linux_prefix": "x86_64-linux-gnu",         "gcc_windows_prefix": "i686-w64-mingw32" },     # Seen on linux
+    "x86":          { "conan_arch": "x86",      "premake_arch": "x86",      "gcc_linux_prefix": "x86_64-linux-gnu",         "gcc_windows_prefix": "i686-w64-mingw32" },     # Seen on windows
 
     # x86 64bit
-    "amd64":        { "conan_arch": "x86_64",   "premake_arch": "x86_64" },     # Seen on windows
-    "x86_64":       { "conan_arch": "x86_64",   "premake_arch": "x86_64" },     # Seen on windows and linux
+    "amd64":        { "conan_arch": "x86_64",   "premake_arch": "x86_64",   "gcc_linux_prefix": "x86_64-linux-gnu",         "gcc_windows_prefix": "x86_64-w64-mingw32" },   # Seen on windows
+    "x86_64":       { "conan_arch": "x86_64",   "premake_arch": "x86_64",   "gcc_linux_prefix": "x86_64-linux-gnu",         "gcc_windows_prefix": "x86_64-w64-mingw32" },   # Seen on windows and linux
 
     # ARM (32bit)
-    "arm":          { "conan_arch": "armv7",    "premake_arch": "ARM" },        # Seen on linux
+    "arm":          { "conan_arch": "armv7",    "premake_arch": "ARM",      "gcc_linux_prefix": "arm-linux-gnueabihf",      "gcc_windows_prefix": "" },                     # Seen on linux
+    "armhf":        { "conan_arch": "armv7",    "premake_arch": "ARM",      "gcc_linux_prefix": "arm-linux-gnueabihf",      "gcc_windows_prefix": "" },                     # Seen on linux
+    "armv7l":       { "conan_arch": "armv7",    "premake_arch": "ARM",      "gcc_linux_prefix": "arm-linux-gnueabihf",      "gcc_windows_prefix": "" },                     # Seen on linux
+    "armv8l":       { "conan_arch": "armv7",    "premake_arch": "ARM",      "gcc_linux_prefix": "arm-linux-gnueabihf",      "gcc_windows_prefix": "" },                     # Seen on linux
 
     # ARM64
-    "arm64":        { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on windows
-    "aarch64":      { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
-    "aarch64_be":   { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
-    "armv8b":       { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
-    "armv8l":       { "conan_arch": "armv8",    "premake_arch": "ARM64" },      # Seen on linux
+    "arm64":        { "conan_arch": "armv8",    "premake_arch": "ARM64",    "gcc_linux_prefix": "aarch64-linux-gnu",        "gcc_windows_prefix": "aarch64-w64-mingw32" },  # Seen on windows
+    "aarch64":      { "conan_arch": "armv8",    "premake_arch": "ARM64",    "gcc_linux_prefix": "aarch64-linux-gnu",        "gcc_windows_prefix": "aarch64-w64-mingw32" },  # Seen on linux
+    "aarch64_be":   { "conan_arch": "armv8",    "premake_arch": "ARM64",    "gcc_linux_prefix": "aarch64_be-linux-gnu",     "gcc_windows_prefix": "" },                     # Seen on linux
 }
 
 def GetThisPlatformInfo():
@@ -61,8 +62,8 @@ def GetPlatformInfo(arch):
 def GetFilename(product, version, system, conf, arch, extension):
     return f'{product}-{version}-{system}-{conf}-{arch}.{extension}' # project_name-1.0.0-Windows-Release-x86_64.zip
 
-def AutomaticFilename(product, version, conf, extension):
-    return GetFilename(product, version, platform.system(), conf, GetThisPlatformInfo()["premake_arch"], extension)
+def AutomaticFilename(product, version, conf, arch, extension):
+    return GetFilename(product, version, platform.system(), conf, GetPlatformInfo(arch)["premake_arch"], extension)
 
 def GetAppVersion(default=""):
     version = os.environ.get("MOXPP_VERSION")
@@ -77,9 +78,3 @@ def ExtractLuaDef(filepath, variable):
     pattern = rf'^\s*{re.escape(variable)}\s*=\s*(["\'])(.*?)\1'
     m = re.search(pattern, text, flags=re.MULTILINE)
     return m.group(2) if m else None
-
-def GetGccPrefix():
-    return subprocess.check_output(["g++", "-dumpmachine"], text=True).strip().partition('-')[2]
-
-def AdjustGccPrefix(arch):
-    return f"{arch}-{GetGccPrefix()}"

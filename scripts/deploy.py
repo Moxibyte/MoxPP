@@ -41,17 +41,18 @@ if __name__ == '__main__':
     # Detect version and architecture
     version = mox.GetAppVersion()
     arch = mox.GetPlatformInfo(args.arch)["premake_arch"]
+    build_folder = f'./build/{arch}-{mox.GetPlatformInfo(args.conf)["premake_arch"]}'
 
     # TODO: Add your own implementation
     #       We do some quick example here
 
     # Simple zip archive with the software (dumb copy)
     # Also add the msvc redists via "AddMSVCRedists" call (does nothing is not on windows!)
-    zipArchive = mox.MDZip(mox.AutomaticFilename("moxpp", version, f'{args.arch}-{args.conf}', "zip"))
-    zipArchive.AddFolder(f'./build/{args.arch}-{args.conf}/bin', '')
+    zipArchive = mox.MDZip(mox.AutomaticFilename("moxpp", version, args.conf, args.arch, "zip"))
+    zipArchive.AddFolder(f'{build_folder}/bin', '')
     # zipArchive.AddMSVCRedists() <-- Add this when you want to distribute redists
     zipArchive.Deploy()
 
     # Source archive
-    srcArchive = mox.MDSrc(mox.AutomaticFilename("moxpp_src", version, f'{args.arch}-{args.conf}', "zip"))
+    srcArchive = mox.MDSrc(mox.AutomaticFilename("moxpp_src", version, args.conf, args.arch, "zip"))
     srcArchive.Deploy()

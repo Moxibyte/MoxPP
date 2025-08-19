@@ -128,9 +128,7 @@ if __name__ == '__main__':
         ))
 
     # GCC Prefix
-    gccPrefix = 'none'
-    if sys.platform.startswith('linux'):
-        gccPrefix = f'{mox.AdjustGccPrefix(arch)}-'
+    gccPrefix = hostArch[f'gcc_{ "linux" if sys.platform.startswith("linux") else "windows"  }_prefix'] + '-'
 
     # Run premake5
     premakeGenerator = GetPremakeGenerator()
