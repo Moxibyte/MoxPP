@@ -41,7 +41,7 @@ if __name__ == '__main__':
     # Detect version and architecture
     version = mox.GetAppVersion()
     arch = mox.GetPlatformInfo(args.arch)["premake_arch"]
-    build_folder = f'./build/{arch}-{mox.GetPlatformInfo(args.conf)["premake_arch"]}'
+    build_folder = f'./build/{arch}-{args.conf}'
 
     # TODO: Add your own implementation
     #       We do some quick example here
