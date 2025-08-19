@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # Also add the msvc redists via "AddMSVCRedists" call (does nothing is not on windows!)
     zipArchive = mox.MDZip(mox.AutomaticFilename("moxpp", version, f'{args.arch}-{args.conf}', "zip"))
     zipArchive.AddFolder(f'./build/{args.arch}-{args.conf}/bin', '')
-    zipArchive.AddMSVCRedists()
+    # zipArchive.AddMSVCRedists() <-- Add this when you want to distribute redists
     zipArchive.Deploy()
 
     # Source archive
