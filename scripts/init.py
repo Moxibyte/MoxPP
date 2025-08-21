@@ -44,7 +44,7 @@ def GetExecutable(exe):
 
 def GetPremakeGenerator():
     if sys.platform.startswith('linux'):
-        return 'gmake2'
+        return 'gmake'
     else:
         vswhere = moxwin.FindLatestVisualStudio()
         vsversion = moxwin.GetVisualStudioYearNumber(vswhere)
@@ -57,7 +57,7 @@ def GetPremakeDownloadUrl(version):
     else:
         return baseUrl + '-windows.zip'
 
-def DownloadPremake(version = '5.0.0-beta4'):
+def DownloadPremake(version = '5.0.0-beta7'):
     premakeDownloadUrl = GetPremakeDownloadUrl(version)
     premakeTargetFolder = './dependencies/premake5'
     premakeTargetZip = f'{premakeTargetFolder}/premake5.tmp'

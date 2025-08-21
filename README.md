@@ -14,6 +14,7 @@ Before you are getting started make sure to install the following applications:
 - Python3 with venv support
 - Visual Studio (Windows)
 - build-essential (Linux)
+- GLIBC_2.38 or more recent (Linux; Premake requirement)
 More information in [BUILDING.md](BUILDING.md)
 
 ## Checklist

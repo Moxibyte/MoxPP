@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import os
 import sys
 import shutil
 import hashlib
@@ -48,14 +49,27 @@ if __name__ == "__main__":
         print(f"Error: Source directory '{src}' does not exist.")
         sys.exit(1)
 
-    ext = ".dll" if platform.system() == "Windows" else ".so"
+    ext = ".dll" if platform.system() == "Windows" else ".so*"
 
-    for file in src.glob(f"*{ext}"):
-        target = dst / file.name
-        if target.exists():
-            same_size = file.stat().st_size == target.stat().st_size
-            same_hash = file_hash(file) == file_hash(target) if same_size else False
-            if same_hash:
-                continue
-        shutil.copy2(file, target)
-        print(f"Copied: {file} -> {target}")
+    for binary_file in src.glob(f"*{ext}"):
+        dest_file = dst / binary_file.name
+        dest_file.parent.mkdir(parents=True, exist_ok=True)
+
+        if dest_file.exists():
+            continue
+
+        if os.name == "nt" or not binary_file.is_symlink():
+            shutil.copy2(binary_file, dest_file)
+            print(f"Copied {binary_file} -> {dest_file}")
+            continue
+
+        # POSIX + symlink: try to recreate the link; if not possible, materialize it
+        link_text = os.readlink(binary_file)  # keep relative target if it was relative
+        try:
+            if dest_file.exists() or dest_file.is_symlink():
+                dest_file.unlink()
+            os.symlink(link_text, dest_file)
+            print(f"Linked {binary_file} -> {dest_file} ({link_text})")
+        except OSError:
+            shutil.copy2(binary_file.resolve(), dest_file)
+            print(f"Copied (materialized) {binary_file} -> {dest_file}")

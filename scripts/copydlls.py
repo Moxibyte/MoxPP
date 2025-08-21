@@ -43,7 +43,7 @@ def copy_binaries(source_root, debug_dest, release_dest, conan_arch):
     if system == "Windows":
         binary_ext = ".dll"
     elif system == "Linux":
-        binary_ext = ".so"
+        binary_ext = ".so*"
     else:
         print(f"Unsupported platform: {system}")
         return
@@ -63,8 +63,23 @@ def copy_binaries(source_root, debug_dest, release_dest, conan_arch):
 
                     for binary_file in platform_path.rglob(f"*{binary_ext}"):
                         dest_file = dest_dir / binary_file.name
-                        shutil.copy2(binary_file, dest_file)
-                        print(f"Copied {binary_file} -> {dest_file}")
+                        dest_file.parent.mkdir(parents=True, exist_ok=True)
+
+                        if os.name == "nt" or not binary_file.is_symlink():
+                            shutil.copy2(binary_file, dest_file)
+                            print(f"Copied {binary_file} -> {dest_file}")
+                            continue
+
+                        # POSIX + symlink: try to recreate the link; if not possible, materialize it
+                        link_text = os.readlink(binary_file)  # keep relative target if it was relative
+                        try:
+                            if dest_file.exists() or dest_file.is_symlink():
+                                dest_file.unlink()
+                            os.symlink(link_text, dest_file)
+                            print(f"Linked {binary_file} -> {dest_file} ({link_text})")
+                        except OSError:
+                            shutil.copy2(binary_file.resolve(), dest_file)
+                            print(f"Copied (materialized) {binary_file} -> {dest_file}")
 
 if __name__ == "__main__":
     # Cli

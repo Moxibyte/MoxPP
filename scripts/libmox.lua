@@ -71,6 +71,7 @@ function mox_project(name, output_name)
         location "./"
         targetname(output_name)
         targetsuffix ""
+        characterset "Unicode"
 
         targetdir "%{wks.location}/build/%{cfg.architecture}-%{cfg.buildcfg}/bin/"
         objdir    "%{wks.location}/build/%{cfg.architecture}-%{cfg.buildcfg}/obj/%{prj.name}/"
@@ -94,13 +95,6 @@ function mox_project(name, output_name)
         defines {
             cmox_macro_prefix .. "VERSION=\"" .. _OPTIONS["mox_version"] .. "\"",
         }
-
-        -- GCC Prefix
-        if not mox_is_windows() then
-            filter { "system:not Windows" }
-                gccprefix (_OPTIONS["mox_gcc_prefix"])
-            filter {}
-        end
 
         -- Debug / Release
         for idx,conf in pairs(cmox_configurations_n) do
@@ -184,9 +178,32 @@ function mox_project(name, output_name)
             end
         end
 
-        -- Ignore linker warning on windows
+        -- Windows options
         if mox_is_windows() then
-            linkoptions { "/IGNORE:4099" }
+            filter { "system:Windows" }
+                -- Ignore linker warning on windows
+                linkoptions { 
+                    "/IGNORE:4099",
+                }
+                -- UTF8 build
+                buildoptions {
+                    "/utf-8",
+                }
+            filter {}
+        end
+
+        -- Linux options
+        if not mox_is_windows() then
+            filter { "system:not Windows" }
+                -- GCC Prefix
+                gccprefix (_OPTIONS["mox_gcc_prefix"])
+                
+                -- so search path
+                linkoptions {
+                    "-Wl,-rpath,'$$ORIGIN'",
+                    "-Wl,--disable-new-dtags",
+                }
+            filter {}
         end
 
         -- Fast compile
@@ -259,7 +276,7 @@ end
 
 -- Unit testing interface
 function mox_setup_test()
-    group("")
+    group("auxiliary")
     mox_project("unittest")
     mox_cpp()
     mox_console()

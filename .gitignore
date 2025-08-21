@@ -1,5 +1,6 @@
-# Python caches
+# Python caches and venv
 **__pycache__**
+/venv/venv
 
 # Conan profiles
 /profiles

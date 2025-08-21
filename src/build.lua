@@ -22,6 +22,8 @@ mox_cpp()
 --    Shared library (.dll / .so)
 -- D) mox_staticlib()
 --    Static library
+-- E) mox_none()
+--    None, used for tools and header only projects
 mox_console()
 
 -- Please uncomment the following line when you create a shared or static lib, that is required for the unittest

@@ -51,6 +51,8 @@ def CleanOutput():
 
 def CleanDependencies():
     shutil.rmtree('./dependencies', ignore_errors=True)
+    shutil.rmtree('./profiles', ignore_errors=True)
+    shutil.rmtree('./dlls', ignore_errors=True)
 
 def CleanProject():
     shutil.rmtree('./vs', ignore_errors=True)
@@ -75,7 +77,7 @@ if __name__ == '__main__':
         CleanProject()
     elif args.mode == 'dependencies':
         CleanDependencies()
-    elif mode == 'all':
+    elif args.mode == 'all':
         CleanOutput()
         CleanProject()
         CleanDependencies()
