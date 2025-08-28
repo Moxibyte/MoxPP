@@ -41,9 +41,9 @@ function mox_discover_subfolders_linux(folder)
 end
 function mox_cli_mox_command(command)
     if mox_is_windows() then
-        return "python %{wks.location}/scripts/mox.py " .. command
+        return "%{wks.location}/mox.bat " .. command
     else
-        return "python3 %{wks.location}/scripts/mox.py " .. command
+        return "%{wks.location}/mox.sh " .. command
     end
 end
 

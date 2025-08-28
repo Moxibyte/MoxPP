@@ -1,3 +1,7 @@
+-- === Pre-Configuration includes ===
+-- Include your custom configuration files (.lua) here
+-- include "myconfig.lua"
+
 -- === Configuration ===
 -- Change the following lines to complete your setup
 
@@ -64,14 +68,14 @@ cmox_unit_test_src = "test"
 -- This is the way to go when implementing custom features
 
 -- This function is called when the workspace is configured
--- function cmox_function_setupworkspace()
---    ...
--- end
+function cmox_function_setupworkspace()
+    startproject "HelloWorld" -- recommended to configure this for visual studio
+end
 
 -- This function is called for each project when it's beeing configured
--- function cmox_function_setupproject()
---     ...
--- end
+function cmox_function_setupproject()
+    
+end
 
 -- This function is called in manual configuration to include
 -- the project

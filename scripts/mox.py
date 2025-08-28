@@ -45,7 +45,7 @@ if __name__ == '__main__':
         returncode = subprocess.run((sys.executable, path, *passthrough)).returncode
         sys.exit(returncode)
     else:
-        print(f'Script "{script}" not found!')
+        print(f'Script "{args.script}" not found!')
         print(f'')
         print(f'Available scripts:')
         for file in os.listdir(os.path.dirname(os.path.abspath(__file__))):
