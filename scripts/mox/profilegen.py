@@ -52,6 +52,7 @@ class INIProfileGen:
         self.StartSection("settings")
         self.WritePair("arch", architecture)
         self.WritePair("os", os)
+        self.WritePair("build_type", "Release")
 
     def __del__(self):
         # Close file
