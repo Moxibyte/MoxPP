@@ -97,11 +97,15 @@ if __name__ == '__main__':
     skipConan = args.skip_conan
     arch = args.arch
 
+    # Create temp folder
+    tempFolder = "./dependencies/conan-temp"
+    os.makedirs(tempFolder, exist_ok=True)
+
     # Generate conan profiles
     os.makedirs("./profiles/", exist_ok=True)
     cpp_version = re.search(r'(\d+)', mox.ExtractLuaDef("./mox.lua", "cmox_cpp_version")).group(1)
-    mox.ProfileGen("./profiles/build", platform.machine().lower(), cpp_version)
-    mox.ProfileGen(f"./profiles/host_{arch}", arch, cpp_version)
+    mox.ProfileGen("./profiles/build", platform.machine().lower(), cpp_version, tempFolder)
+    mox.ProfileGen(f"./profiles/host_{arch}", arch, cpp_version, tempFolder)
 
     # Download tool applications
     DownloadPremake()

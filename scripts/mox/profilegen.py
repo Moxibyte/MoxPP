@@ -71,6 +71,16 @@ class INIProfileGen:
         self.WritePair("compiler.version", msvcversion)
         self.WritePair("compiler.runtime", runtime)
 
+    def AddTempFolder(self, is_windows: bool, tempfolder: str):
+        self.StartSection("buildenv")
+        if is_windows:
+            self.WritePair("TEMP", tempfolder)
+            self.WritePair("TMP", tempfolder)
+        else:
+            self.WritePair("TMPDIR", tempfolder)
+            self.WritePair("TEMP", tempfolder)
+            self.WritePair("TMP", tempfolder)
+
     def AddGccCrossLink(self, compilerprefix: str):
         self.StartSection("buildenv")
         self.WritePair("CC", f"{compilerprefix}-gcc")
@@ -83,7 +93,7 @@ class INIProfileGen:
     def WritePair(self, key: str, value: str):
         self.file.write(f"{key}={value}\n")
 
-def ProfileGen(path: str, architecture: str, cppversion: str):
+def ProfileGen(path: str, architecture: str, cppversion: str, tempfolder: str):
     is_windows = platform.system().lower() == "windows"
     platformInfo = mox.GetPlatformInfo(architecture)
     arch = platformInfo["conan_arch"]
@@ -99,3 +109,4 @@ def ProfileGen(path: str, architecture: str, cppversion: str):
         gen.AddGcc(cppversion, gcc_version, "libstdc++11")
         if architecture.lower() != platform.machine().lower():
             gen.AddGccCrossLink(platformInfo["gcc_linux_prefix"])
+    gen.AddTempFolder(is_windows, tempfolder)

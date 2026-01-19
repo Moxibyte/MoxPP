@@ -1,5 +1,6 @@
 -- === Pre-Configuration includes ===
 -- Include your custom configuration files (.lua) here
+-- Include are relative to the repo
 -- include "myconfig.lua"
 
 -- === Configuration ===
