@@ -98,7 +98,7 @@ if __name__ == '__main__':
     arch = args.arch
 
     # Create temp folder
-    tempFolder = "./dependencies/conan-temp"
+    tempFolder = str(os.path.abspath("./dependencies/conan-temp"))
     os.makedirs(tempFolder, exist_ok=True)
 
     # Generate conan profiles
