@@ -36,6 +36,8 @@ import argparse
 import subprocess
 import urllib.request
 
+DEFAULT_TO_CONAN_ALWAY_RELEASE = True
+
 def GetExecutable(exe):
     if sys.platform.startswith('linux'):
         return exe
@@ -92,10 +94,12 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser(prog="init.py", allow_abbrev=False)
     p.add_argument("--skip-conan", action="store_true", help="Skip Conan evaluation")
     p.add_argument("--arch", default=platform.machine().lower(), help="Alternative (cross compile) architecture")
+    p.add_argument("--conan-release-only", action=argparse.BooleanOptionalAction, default=DEFAULT_TO_CONAN_ALWAY_RELEASE, help="Forces conan into only generating release dependencies.")
     args = p.parse_args()
 
     skipConan = args.skip_conan
     arch = args.arch
+    conanReleaseOnly = args.conan_release_only
 
     # Create temp folder
     tempFolder = str(os.path.abspath("./dependencies/conan-temp"))
@@ -122,7 +126,8 @@ if __name__ == '__main__':
 
     # Generate conan project
     if not skipConan:
-        subprocess.run(ConanBuild('Debug', f'host_{arch}', 'build'))
+        if not conanReleaseOnly:
+            subprocess.run(ConanBuild('Debug', f'host_{arch}', 'build'))
         subprocess.run(ConanBuild('Release', f'host_{arch}', 'build'))
         # Copy conan dlls
         subprocess.run((
@@ -142,6 +147,7 @@ if __name__ == '__main__':
         f'--mox_premake_arch={ hostArch["premake_arch"] }',
         f'--mox_gcc_prefix={ gccPrefix }',
         f'--mox_version={ version }',
+        f'--mox_conan_release_only={ conanReleaseOnly }',
         '--file=./scripts/premake5.lua',
         premakeGenerator
     ))

@@ -66,6 +66,20 @@ newoption {
     category = "MoxPP",
     default = "unknown"
 }
+newoption {
+    trigger = "mox_conan_release_only",
+    value = "CONAN_RELEASE_ONLY",
+    description = "Indicates that conan only generated release dependencies",
+    category = "MoxPP",
+    allowed = {
+        { "True", "True" },
+        { "False", "False" },
+    },
+    default = "False"
+}
+
+-- Extract if conan is release only
+hmox_conan_release_only = _OPTIONS["mox_conan_release_only"] == "True"
 
 workspace(cmox_product_name)
     -- Workspace configuration

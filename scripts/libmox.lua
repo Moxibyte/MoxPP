@@ -109,12 +109,18 @@ function mox_project(name, output_name)
                         cmox_macro_prefix .. "DEBUG",
                     }
                     symbols "On"
+                    if hmox_conan_release_only then
+                        runtime "Release"
+                    else
+                        runtime "Debug"
+                    end
                 else
                     defines {
                         "NDEBUG",
                         cmox_macro_prefix .. "NDEBUG",
                     }
                     optimize "On"
+                    runtime "Release"
                 end
             filter {}
         end
@@ -169,7 +175,7 @@ function mox_project(name, output_name)
                 local is_debug = cmox_configurations_d[idx]
 
                 filter { "configurations:" .. conf, "kind:ConsoleApp or WindowedApp" }
-                    if is_debug then
+                    if is_debug and not hmox_conan_release_only then
                         mox_runpy_postbuild("distdlls %{wks.location}/dlls/Debug-%{cfg.architecture} %{cfg.targetdir}")
                     else
                         mox_runpy_postbuild("distdlls %{wks.location}/dlls/Release-%{cfg.architecture} %{cfg.targetdir}")
@@ -298,7 +304,7 @@ function mox_add_conan_itterate(func)
     for idx,conf in pairs(cmox_configurations_n) do
         local is_debug = cmox_configurations_d[idx]
         filter { "configurations:" .. conf }
-            if is_debug then
+            if is_debug and not hmox_conan_release_only then
                 func("debug_" .. _OPTIONS["mox_premake_arch"]:lower())
             else
                 func("release_" .. _OPTIONS["mox_premake_arch"]:lower())
