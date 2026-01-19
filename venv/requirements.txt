@@ -1,2 +1,2 @@
-conan==2.19.1
+conan==2.24.0
 python-certifi-win32==1.6.1; sys_platform == "win32"
