@@ -36,7 +36,7 @@ import argparse
 import subprocess
 import urllib.request
 
-DEFAULT_TO_CONAN_ALWAY_RELEASE = True
+DEFAULT_TO_CONAN_ALWAY_RELEASE = False
 
 def GetExecutable(exe):
     if sys.platform.startswith('linux'):
@@ -59,7 +59,7 @@ def GetPremakeDownloadUrl(version):
     else:
         return baseUrl + '-windows.zip'
 
-def DownloadPremake(version = '5.0.0-beta7'):
+def DownloadPremake(version = '5.0.0-beta8'):
     premakeDownloadUrl = GetPremakeDownloadUrl(version)
     premakeTargetFolder = './dependencies/premake5'
     premakeTargetZip = f'{premakeTargetFolder}/premake5.tmp'

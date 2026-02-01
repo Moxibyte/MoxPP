@@ -35,6 +35,8 @@ def FindLatestVisualStudio():
 
 def GetVisualStudioYearNumber(vswhere):
     installationVersion = vswhere[0]['installationVersion'].split('.')[0]
+    if installationVersion == '18':
+        return '2026'
     if installationVersion == '17':
         return '2022'
     if installationVersion == '16':
