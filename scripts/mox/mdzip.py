@@ -43,9 +43,9 @@ class MDZip:
             if os.path.isfile(path):
                 self.AddFile(path, f'{name}/{file}')
 
-    def AddMSVCRedists(self):
+    def AddMSVCRedists(self, vsVersion=None):
         if sys.platform.startswith('win'):
-            vswhere = moxwin.FindLatestVisualStudio()
+            vswhere = moxwin.FindPreferedVisualStudio(vsVersion)
             vspath = moxwin.GetVisualStudioPath(vswhere)
             redist_base_dir = pathlib.Path(vspath) / 'VC' / 'Redist' / 'MSVC'
             redist_canidates = sorted(redist_base_dir.glob('v*/vc_redist.x64.exe'), reverse=True)

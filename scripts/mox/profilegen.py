@@ -96,14 +96,14 @@ class INIProfileGen:
     def WritePair(self, key: str, value: str):
         self.file.write(f"{key}={value}\n")
 
-def ProfileGen(path: str, architecture: str, cppversion: str, tempfolder: str):
+def ProfileGen(path: str, architecture: str, cppversion: str, tempfolder: str, vsVersion: str):
     is_windows = platform.system().lower() == "windows"
     platformInfo = mox.GetPlatformInfo(architecture)
     arch = platformInfo["conan_arch"]
 
     gen = INIProfileGen(path, arch, platform.system())
     if is_windows:
-        vs_version = moxwin.FindLatestVisualStudio()[0]["catalog"]["buildVersion"]
+        vs_version = moxwin.FindPreferedVisualStudio(vsVersion)["catalog"]["buildVersion"]
         vs_version = ".".join(vs_version.split(".")[:2])
         msvc_version = VS_MSVC_MAPPINGS[vs_version]
         gen.AddMSVC(cppversion, msvc_version, "dynamic")

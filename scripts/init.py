@@ -44,11 +44,11 @@ def GetExecutable(exe):
     else:
         return f'{exe}.exe'
 
-def GetPremakeGenerator():
+def GetPremakeGenerator(vsVersion):
     if sys.platform.startswith('linux'):
         return 'gmake'
     else:
-        vswhere = moxwin.FindLatestVisualStudio()
+        vswhere = moxwin.FindPreferedVisualStudio(vsVersion)
         vsversion = moxwin.GetVisualStudioYearNumber(vswhere)
         return f'vs{vsversion}'
 
@@ -95,11 +95,13 @@ if __name__ == '__main__':
     p.add_argument("--skip-conan", action="store_true", help="Skip Conan evaluation")
     p.add_argument("--arch", default=platform.machine().lower(), help="Alternative (cross compile) architecture")
     p.add_argument("--conan-release-only", action=argparse.BooleanOptionalAction, default=DEFAULT_TO_CONAN_ALWAY_RELEASE, help="Forces conan into only generating release dependencies.")
+    p.add_argument("--vs-version", choices=["2017", "2019", "2022", "2026"], help="Forces a visual studio version")
     args = p.parse_args()
 
     skipConan = args.skip_conan
     arch = args.arch
     conanReleaseOnly = args.conan_release_only
+    vsVersion = args.vs_version
 
     # Create temp folder
     tempFolder = str(os.path.abspath("./dependencies/conan-temp"))
@@ -108,8 +110,8 @@ if __name__ == '__main__':
     # Generate conan profiles
     os.makedirs("./profiles/", exist_ok=True)
     cpp_version = re.search(r'(\d+)', mox.ExtractLuaDef("./mox.lua", "cmox_cpp_version")).group(1)
-    mox.ProfileGen("./profiles/build", platform.machine().lower(), cpp_version, tempFolder)
-    mox.ProfileGen(f"./profiles/host_{arch}", arch, cpp_version, tempFolder)
+    mox.ProfileGen("./profiles/build", platform.machine().lower(), cpp_version, tempFolder, vsVersion)
+    mox.ProfileGen(f"./profiles/host_{arch}", arch, cpp_version, tempFolder, vsVersion)
 
     # Download tool applications
     DownloadPremake()
@@ -140,7 +142,7 @@ if __name__ == '__main__':
     gccPrefix = hostArch[f'gcc_{ "linux" if sys.platform.startswith("linux") else "windows"  }_prefix'] + '-'
 
     # Run premake5
-    premakeGenerator = GetPremakeGenerator()
+    premakeGenerator = GetPremakeGenerator(vsVersion)
     subprocess.run((
         './dependencies/premake5/premake5',
         f'--mox_conan_arch={ hostArch["conan_arch"] }',

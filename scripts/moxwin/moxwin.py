@@ -31,10 +31,22 @@ def GetCodepage():
 def FindLatestVisualStudio():
     vswhere = os.getenv('programfiles(x86)') + '\\Microsoft Visual Studio\\Installer\\vswhere.exe'
     out = subprocess.check_output((vswhere, '-latest', '-nocolor', '-format', 'json'))
-    return json.loads(out.decode(f'cp{GetCodepage()}'))
+    return json.loads(out.decode(f'cp{GetCodepage()}'))[0]
+
+def FindPreferedVisualStudio(preference):
+    if not preference:
+        return FindLatestVisualStudio()
+    else:
+        vswhere = os.getenv('programfiles(x86)') + '\\Microsoft Visual Studio\\Installer\\vswhere.exe'
+        out = subprocess.check_output((vswhere, '-all', '-nocolor', '-format', 'json'))
+        outData = json.loads(out.decode(f'cp{GetCodepage()}'))
+        for outElement in outData:
+            if GetVisualStudioYearNumber(outElement) == preference:
+                return outElement
+        return None
 
 def GetVisualStudioYearNumber(vswhere):
-    installationVersion = vswhere[0]['installationVersion'].split('.')[0]
+    installationVersion = vswhere['installationVersion'].split('.')[0]
     if installationVersion == '18':
         return '2026'
     if installationVersion == '17':
@@ -45,4 +57,4 @@ def GetVisualStudioYearNumber(vswhere):
         return '2017'
 
 def GetVisualStudioPath(vswhere):
-    return vswhere[0]['installationPath']
+    return vswhere['installationPath']
