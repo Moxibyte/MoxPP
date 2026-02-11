@@ -38,6 +38,7 @@ def RecursiveRemove(root_dir, extensions_to_remove = (), exclude_subdirs = ()):
         if os.path.isfile(path):
             for ext in extensions_to_remove:
                 if str(path).endswith(ext):
+                    print(f'Removing {path}')
                     os.remove(path)
 
         if os.path.isdir(path):
@@ -59,7 +60,7 @@ def CleanProject():
     RecursiveRemove(
         './',
         ('.sln', '.slnx', '.vcxproj', '.vcxproj.user', '.vcxproj.filters', 'Makefile'),
-        ('.git', '.vs', 'app', 'build', 'dependencies', 'scripts', 'submodules')
+        ('./.git', './.vs', './venv', './app', './build', './dependencies', './scripts', './submodules')
     )
 
 if __name__ == '__main__':
