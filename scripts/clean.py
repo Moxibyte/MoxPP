@@ -59,7 +59,7 @@ def CleanProject():
     RecursiveRemove(
         './',
         ('.sln', '.slnx', '.vcxproj', '.vcxproj.user', '.vcxproj.filters', 'Makefile'),
-        ('.git', '.vs', 'app', 'build', 'dependencies', 'scripts')
+        ('.git', '.vs', 'app', 'build', 'dependencies', 'scripts', 'submodules')
     )
 
 if __name__ == '__main__':

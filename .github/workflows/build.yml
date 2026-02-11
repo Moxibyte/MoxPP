@@ -17,6 +17,8 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.12' 
+    - name: Updating Packages
+      run: sudo apt-get update
     - name: Install Multilib
       run: sudo apt-get install gcc-multilib g++-multilib
     - name: MoxPP Init
@@ -45,6 +47,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+    - name: Updating Packages
+      run: sudo apt-get update
     - name: Install Cross-Compiler
       run: sudo apt-get install crossbuild-essential-arm64
     - name: Install python
