@@ -1,5 +1,5 @@
 # MoxPP
-C++ Template Repository with Conan2 and Premake5 for Windows and Linux. Out of the Box unit-testing and GitHub actions.
+C++ Template Repository with Conan2 and Premake5 for Windows, Linux and MacOS. Out of the Box unit-testing and GitHub actions.
 
 **Please make sure to read the WHOLE readme and follow all instructions!**
 
@@ -15,6 +15,7 @@ Before you are getting started make sure to install the following applications:
 - Visual Studio (Windows)
 - build-essential (Linux)
 - GLIBC_2.38 or more recent (Linux; Premake requirement)
+- Xcode with clang and default abi (MacOS)
 More information in [BUILDING.md](BUILDING.md)
 
 ## Checklist

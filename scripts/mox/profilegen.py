@@ -1,7 +1,7 @@
 """
 Generates conan profiles
 
-Copyright (c) 2025 Moxibyte GmbH
+Copyright (c) 2026 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import re
 import mox
 import moxwin
 import platform
@@ -54,7 +55,10 @@ class INIProfileGen:
         # Begin conan profile section
         self.StartSection("settings")
         self.WritePair("arch", architecture)
-        self.WritePair("os", os)
+        if os != "Darwin":
+            self.WritePair("os", os)
+        else:
+            self.WritePair("os", "Macos")
         self.WritePair("build_type", "Release")
 
     def __del__(self):
@@ -66,6 +70,12 @@ class INIProfileGen:
         self.WritePair("compiler", "gcc")
         self.WritePair("compiler.cppstd", cppversion)
         self.WritePair("compiler.version", gccversion)
+        self.WritePair("compiler.libcxx", abiversion)
+
+    def AddClang(self, cppversion: str, clangversion: str, abiversion: str):
+        self.WritePair("compiler", "clang")
+        self.WritePair("compiler.cppstd", cppversion)
+        self.WritePair("compiler.version", clangversion)
         self.WritePair("compiler.libcxx", abiversion)
 
     def AddMSVC(self, cppversion: str, msvcversion: str, runtime: str):
@@ -98,6 +108,7 @@ class INIProfileGen:
 
 def ProfileGen(path: str, architecture: str, cppversion: str, tempfolder: str, vsVersion: str):
     is_windows = platform.system().lower() == "windows"
+    is_macos = platform.system().lower() == "darwin"
     platformInfo = mox.GetPlatformInfo(architecture)
     arch = platformInfo["conan_arch"]
 
@@ -107,6 +118,9 @@ def ProfileGen(path: str, architecture: str, cppversion: str, tempfolder: str, v
         vs_version = ".".join(vs_version.split(".")[:2])
         msvc_version = VS_MSVC_MAPPINGS[vs_version]
         gen.AddMSVC(cppversion, msvc_version, "dynamic")
+    elif is_macos:
+        clang_version = re.search(r"Apple clang version (\d\d)\.\d\.\d", subprocess.check_output(("clang", "--version"), text=True).strip()).group(1)
+        gen.AddClang(cppversion, clang_version, "libc++")
     else:
         gcc_version = subprocess.check_output(("g++", "-dumpversion"), text=True).strip()
         gen.AddGcc(cppversion, gcc_version, "libstdc++11")

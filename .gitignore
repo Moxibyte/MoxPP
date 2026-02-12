@@ -28,5 +28,11 @@
 **.vcxproj.user
 **.vcxproj.filters
 
+# Xcode and macos by products
+**.xcodeproj/
+**.xcworkspace/
+**/.DS_Store
+
+
 # Dependencie graph output
 /dependencies_*.html

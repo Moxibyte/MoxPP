@@ -42,14 +42,23 @@ if __name__ == "__main__":
     p.add_argument("dst", help="Destination path")
     args = p.parse_args()
 
-    src = Path(args.src)
-    dst = Path(args.dst)
+    src = Path(args.src).resolve()
+    dst = Path(args.dst).resolve()
+
+    print(os.getcwd())
 
     if not src.is_dir():
         print(f"Error: Source directory '{src}' does not exist.")
         sys.exit(1)
 
-    ext = ".dll" if platform.system() == "Windows" else ".so*"
+    pf = platform.system().lower()
+    ext = None
+    if pf == "windows":
+        ext = ".dll"
+    elif pf == "darwin":
+        ext = ".dylib"
+    else:
+        ext = ".so*"
 
     for binary_file in src.glob(f"*{ext}"):
         dest_file = dst / binary_file.name

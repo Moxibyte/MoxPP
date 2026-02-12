@@ -19,6 +19,27 @@ jobs:
         python-version: '3.12' 
     - name: Build and run unit test
       run: ./mox.sh test
+
+  test_macos:
+    name: Test MacOS
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Ensure Xcode CLI Tools
+      run: |
+        xcode-select --install || true
+        sudo xcodebuild -license accept || true
+    - name: Update Homebrew and build Tools
+      run: |
+        brew update
+        brew install cmake ninja || true
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    - name: Build and run unit test
+      run: ./mox.bat test
      
   test_windows:
     name: Test Windows

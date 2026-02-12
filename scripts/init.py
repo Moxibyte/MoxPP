@@ -2,7 +2,7 @@
 Project initialization script
 This will initialize your VisualStudio solution / Your makefile
 
-Copyright (c) 2025 Moxibyte GmbH
+Copyright (c) 2026 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,25 +39,32 @@ import urllib.request
 DEFAULT_TO_CONAN_ALWAY_RELEASE = False
 
 def GetExecutable(exe):
-    if sys.platform.startswith('linux'):
-        return exe
-    else:
+    pf = platform.system().lower()
+    if pf == "windows":
         return f'{exe}.exe'
+    else:
+        return exe
 
 def GetPremakeGenerator(vsVersion):
-    if sys.platform.startswith('linux'):
-        return 'gmake'
-    else:
+    pf = platform.system().lower()
+    if pf == "windows":
         vswhere = moxwin.FindPreferedVisualStudio(vsVersion)
         vsversion = moxwin.GetVisualStudioYearNumber(vswhere)
         return f'vs{vsversion}'
+    elif pf == "darwin":
+        return "xcode4"
+    else:
+        return 'gmake'
 
 def GetPremakeDownloadUrl(version):
-    baseUrl = f'https://github.com/premake/premake-core/releases/download/v{version}/premake-{version}'
-    if sys.platform.startswith('linux'):
-        return baseUrl + '-linux.tar.gz'
+    pf = platform.system().lower()
+    baseUrl = f'https://github.com/premake/premake-core/releases/download/v{version}/premake-{version}-'
+    if pf == "windows":
+        return baseUrl + 'windows.zip'
+    elif pf == "darwin":
+        return baseUrl + 'macosx.tar.gz'
     else:
-        return baseUrl + '-windows.zip'
+        return baseUrl + 'linux.tar.gz'
 
 def DownloadPremake(version = '5.0.0-beta8'):
     premakeDownloadUrl = GetPremakeDownloadUrl(version)
@@ -137,6 +144,10 @@ if __name__ == '__main__':
             './scripts/copydlls.py',
             arch
         ))
+        # Fix conan include for maxos
+        if platform.system().lower() == "darwin":
+            mox.ReplaceInFile('./dependencies/conandeps.premake5.lua', 'includedirs(conandeps[conf][pkg]["includedirs"])', 'externalincludedirs(conandeps[conf][pkg]["includedirs"])')
+
 
     # GCC Prefix
     gccPrefix = hostArch[f'gcc_{ "linux" if sys.platform.startswith("linux") else "windows"  }_prefix'] + '-'

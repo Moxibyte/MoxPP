@@ -6,7 +6,7 @@ Multiple modes:
 - "dependencies": Removes the external downloaded dependencies (not the conan cache)
 - "all": All above steps
 
-Copyright (c) 2025 Moxibyte GmbH
+Copyright (c) 2026 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

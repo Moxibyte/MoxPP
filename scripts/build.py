@@ -2,7 +2,7 @@
 Will build your project
 Compiles the project dependent on your system (MSBuild / Makefile)
 
-Copyright (c) 2025 Moxibyte GmbH
+Copyright (c) 2026 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,10 @@ SOFTWARE.
 """
 import moxwin
 
-import sys
+import re
 import glob
 import argparse
+import platform
 import subprocess
 
 def WindowsBuild(conf):
@@ -36,7 +37,7 @@ def WindowsBuild(conf):
     msbuild = f'{vspath}\\MSBuild\\Current\\Bin\\MSBuild.exe'
 
     # Find solution file
-    slnFiles = glob.glob('*.sln')
+    slnFiles = glob.glob('*.sln') + glob.glob('*.slnx')
     if len(slnFiles) == 0:
         print('No solution file found! Building not possible!')
         return
@@ -53,6 +54,32 @@ def LinuxBuild(conf):
         'make', f'config={conf.lower()}', 'all'
     ))
 
+def MacosBuild(conf):
+    # Find workspace
+    workspace = glob.glob('*.xcworkspace')
+    if len(workspace) == 0:
+        print('No xcode workspace file found! Building not possible!')
+        return
+
+    # Find all schemes
+    schemesCall = subprocess.check_output((
+        'xcodebuild',
+        '-list',
+        '-workspace', workspace[0]
+    ), text=True)
+    schemesString = re.search(r"Schemes:\s*(.*)", schemesCall, re.M | re.S).group(1)
+    schemes = re.findall(r"\S+", schemesString)
+    
+    # Build
+    for scheme in schemes:
+        subprocess.run((
+            'xcodebuild',
+            '-workspace', workspace[0],
+            '-scheme', scheme,
+            '-configuration', conf,
+            'build'
+        ))
+
 if __name__ == '__main__':
     # Configuration from cli
     p = argparse.ArgumentParser(prog="build.py", allow_abbrev=False)
@@ -60,7 +87,10 @@ if __name__ == '__main__':
     args = p.parse_args()
 
     # Run build step
-    if sys.platform.startswith('linux'):
-        LinuxBuild(args.conf)
-    else:
+    pf = platform.system().lower()
+    if pf == "windows":
         WindowsBuild(args.conf)
+    elif pf == "darwin":
+        MacosBuild(args.conf)
+    else:
+        LinuxBuild(args.conf)

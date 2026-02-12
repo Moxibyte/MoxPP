@@ -78,3 +78,10 @@ def ExtractLuaDef(filepath, variable):
     pattern = rf'^\s*{re.escape(variable)}\s*=\s*(["\'])(.*?)\1'
     m = re.search(pattern, text, flags=re.MULTILINE)
     return m.group(2) if m else None
+
+def ReplaceInFile(path, old, new):
+    with open(path, 'r', encoding='utf-8') as f:
+        data = f.read()
+    data = data.replace(old, new)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(data)

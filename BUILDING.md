@@ -4,6 +4,7 @@ This project supports building on
 | ----------- | ------------------ | ------------------ | ------------------ | ------------------ |
 | **Windows** | :white_check_mark: | :white_check_mark: | :x:                | :white_check_mark: |
 | **Linux**   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| **MacOS**   | :x:                | :x:                | :x:                | :white_check_mark: |
 
 ## Requirements
 - Python3 with venv
@@ -40,6 +41,17 @@ As soon as you are ready to build run the following commands
 ./mox.sh run --conf Debug EXECUTABLE_NAME
 ```
 The above commands also fully work on windows (use `mox` or `mox.bat` instead of `./mox.sh`).
+
+## MacOS
+### Setting up the project
+To create the xcode projects run the following command in the root of the repository
+```sh
+./mox.sh init
+```
+*This will also download and compile all external dependencies. Please be patient.*
+
+### Writing code and compiling
+After setting up the project, you will find a `.xcworkspace` folder in the root directory. Open this folder with xcode or via finder.
 
 ## Releases
 This project is designed to automatically set it's version macro and release all artifacts. This happens via GitHub actions (if not deleted) or via a manual `mox deploy` call. The call expects a environment variable `MOXPP_VERSION` to be set to the current version string (Will be automatically the tag name of the github release when using actions). The deploy process can be seen in `/scripts/deploy.py`.

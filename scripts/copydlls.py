@@ -1,7 +1,7 @@
 """
 Script that copies all conan .dll/.so files to a dedicated directory
 
-Copyright (c) 2025 Moxibyte GmbH
+Copyright (c) 2026 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,10 +39,12 @@ def copy_binaries(source_root, debug_dest, release_dest, conan_arch):
         return
 
     # Determine file extension based on platform
-    system = platform.system()
-    if system == "Windows":
+    system = platform.system().lower()
+    if system == "windows":
         binary_ext = ".dll"
-    elif system == "Linux":
+    elif system == "darwin":
+        binary_ext = ".dylib"
+    elif system == "linux":
         binary_ext = ".so*"
     else:
         print(f"Unsupported platform: {system}")

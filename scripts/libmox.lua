@@ -1,6 +1,6 @@
 -- Lua utils for MoxPP
 --
--- Copyright (c) 2025 Moxibyte GmbH
+-- Copyright (c) 2026 Moxibyte GmbH
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -73,8 +73,8 @@ function mox_project(name, output_name)
         targetsuffix ""
         characterset "Unicode"
 
-        targetdir "%{wks.location}/build/%{cfg.architecture}-%{cfg.buildcfg}/bin/"
-        objdir    "%{wks.location}/build/%{cfg.architecture}-%{cfg.buildcfg}/obj/%{prj.name}/"
+        targetdir ("%{wks.location}/build/" .. _OPTIONS["mox_premake_arch"] .. "-%{cfg.buildcfg}/bin/")
+        objdir    ("%{wks.location}/build/" .. _OPTIONS["mox_premake_arch"] .. "-%{cfg.buildcfg}/obj/%{prj.name}/")
 
         debugdir  "%{wks.location}/app"
 
@@ -133,6 +133,11 @@ function mox_project(name, output_name)
                 "_WIN32_WINNT=0x0A00",
             }
         filter {}
+        filter { "system:macosx" }
+            defines {
+                cmox_macro_prefix .. "OS_MACOS",
+            }
+        filter {}
         filter { "system:unix or linux" }
             defines {
                 cmox_macro_prefix .. "OS_LINUX",
@@ -168,6 +173,13 @@ function mox_project(name, output_name)
                 cmox_macro_prefix .. "BIT_64",
             }
         filter {}
+        filter { "architecture:universal" }
+            defines {
+                cmox_macro_prefix .. "ARCH_UNIVERSAL",
+                cmox_macro_prefix .. "ARCH_TYPE_APPLESILICON",
+                cmox_macro_prefix .. "BIT_64",
+            }
+        filter {}
 
         -- DLL Distribution
         if cmox_copy_dlls then
@@ -176,9 +188,9 @@ function mox_project(name, output_name)
 
                 filter { "configurations:" .. conf, "kind:ConsoleApp or WindowedApp" }
                     if is_debug and not hmox_conan_release_only then
-                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Debug-%{cfg.architecture} %{cfg.targetdir}")
+                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Debug-" .. _OPTIONS["mox_premake_arch"] .. " %{cfg.targetdir}")
                     else
-                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Release-%{cfg.architecture} %{cfg.targetdir}")
+                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Release-" .. _OPTIONS["mox_premake_arch"] .. " %{cfg.targetdir}")
                     end
                 filter {}
             end
@@ -198,16 +210,22 @@ function mox_project(name, output_name)
             filter {}
         end
 
-        -- Linux options
+        -- Non-Windows options
         if not mox_is_windows() then
-            filter { "system:not Windows" }
+            filter { "system:macosx" }
+                -- dylib location (note: work not when creating app/dmg packages)
+                linkoptions {
+                    "-Wl,-rpath,@executable_path",
+                }
+            filter {}
+            
+            filter { "system: not windows and not macosx" }
                 -- GCC Prefix
                 gccprefix (_OPTIONS["mox_gcc_prefix"])
-                
-                -- so search path
+                -- so searching
                 linkoptions {
-                    "-Wl,-rpath,'$$ORIGIN'",
                     "-Wl,--disable-new-dtags",
+                    "-Wl,-rpath,'$$ORIGIN'",
                 }
             filter {}
         end
@@ -237,7 +255,7 @@ end
 function mox_cpp(cppstd)
     language "C++"
     cppdialect(cmox_cpp_version)
-
+    
     mox_add_conan_building()
 end
 function mox_console()

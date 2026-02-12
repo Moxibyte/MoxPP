@@ -59,7 +59,30 @@ jobs:
       run: ./mox.sh init --arch aarch64
     - name: MoxPP Build
       run: ./mox.sh build
-     
+
+  build_macos:
+    name: Build MacOS ARM64
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Ensure Xcode CLI Tools
+      run: |
+        xcode-select --install || true
+        sudo xcodebuild -license accept || true
+    - name: Update Homebrew and build Tools
+      run: |
+        brew update
+        brew install cmake ninja || true
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    - name: MoxPP Init
+      run: ./mox.sh init
+    - name: MoxPP Build
+      run: ./mox.sh build
+
   build_windows_32bit:
     name: Build Windows x86
     runs-on: windows-latest
