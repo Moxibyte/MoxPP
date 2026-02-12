@@ -39,7 +39,7 @@ jobs:
       with:
         python-version: '3.12'
     - name: Build and run unit test
-      run: ./mox.bat test
+      run: ./mox.sh test
      
   test_windows:
     name: Test Windows
