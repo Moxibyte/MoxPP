@@ -46,6 +46,7 @@ VS_MSVC_MAPPINGS = {
     "18.0": "195",
     "18.1": "195",
     "18.2": "195",
+    "18.3": "195",
 }
 
 class INIProfileGen:

@@ -94,6 +94,8 @@ function mox_project(name, output_name)
 
         defines {
             cmox_macro_prefix .. "VERSION=\"" .. _OPTIONS["mox_version"] .. "\"",
+            cmox_macro_prefix .. "WORKSPACE_ROOT=\"" .. path.getabsolute(_WORKING_DIR) .. "\"",
+            cmox_macro_prefix .. "PROJECT_ROOT=\"" .. path.getabsolute("./") .. "\"",
         }
 
         -- Debug / Release
