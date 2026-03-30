@@ -9,6 +9,14 @@ Audit `CLAUDE.md` against the actual project files and propose any corrections. 
 
 ## Steps
 
+### 0. Check for unconfigured template state
+
+Read `CLAUDE.md` and check if the top section still contains the unconfigured placeholder (i.e. the line `> This is an unconfigured MoxPP template`). If it does, **stop immediately** and tell the user:
+
+> This repo hasn't been configured yet. Run `/moxpp-setup` first, then re-run `/moxpp-check` once the project is set up.
+
+Do not proceed with any further checks.
+
 ### 1. Read all source-of-truth files
 
 Read the following files in parallel:
