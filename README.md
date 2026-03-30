@@ -11,9 +11,9 @@ C++ Template Repository with Conan2 and Premake5 for Windows, Linux and MacOS. O
 
 ## Dependencies
 Before you are getting started make sure to install the following applications:
-- Python3 with venv support
-- Visual Studio (Windows)
-- build-essential (Linux)
+- Python3 with venv (On linux `python3` and `python3-venv`)
+- Visual Studio with the C++ workloads (Windows)
+- Package `build-essential` (Linux only) 
 - GLIBC_2.38 or more recent (Linux; Premake requirement)
 - Xcode with clang and default abi (MacOS)
 More information in [BUILDING.md](BUILDING.md)
