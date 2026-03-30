@@ -1,7 +1,7 @@
 -- This line starts a new project it needs to be the first line
 -- Arguments
 -- 1) Name of the project used in the visual studio solution
--- 2) Output name of the project (name of the exe / lib)
+-- 2) OPTIONAL: Output name of the project (name of the exe / lib)
 mox_project("HelloWorld", "hello_world")
 
 -- This line selects the programming language
@@ -22,8 +22,10 @@ mox_cpp()
 --    Shared library (.dll / .so)
 -- D) mox_staticlib()
 --    Static library
--- E) mox_none()
---    None, used for tools and header only projects
+-- E) mox_utility()
+--    Utility, used for custom build actions without code (will build but no code)
+-- F) mox_none()
+--    None, used for header only projects (skipped during build)
 mox_console()
 
 -- Make sure to give each project a unique GUID (For example generated here: https://www.famkruithof.net/uuid/uuidgen)

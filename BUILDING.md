@@ -7,9 +7,9 @@ This project supports building on
 | **MacOS**   | :x:                | :x:                | :x:                | :white_check_mark: |
 
 ## Requirements
-- Python3 with venv
+- Python3 with venv (On linux `python3` and `python3-venv`)
 - Visual Studio with the C++ workloads (Windows)
-- build-essential (Linux)
+- Package `build-essential` (Linux only) 
 - GLIBC_2.38 or more recent (Linux; Premake requirement)
 - CMake (Required for some conan packages, but not for the template)
 

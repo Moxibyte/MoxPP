@@ -294,6 +294,9 @@ function mox_staticlib()
         cmox_macro_prefix .. "LIB_STATIC",
     }
 end
+function mox_utility()
+    kind "Utility"
+end
 function mox_none()
     kind "None"
 end

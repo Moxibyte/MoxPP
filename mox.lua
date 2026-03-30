@@ -3,6 +3,10 @@
 -- Include are relative to the repo
 -- include "myconfig.lua"
 
+-- === Custom CLI Switches ===
+-- Here you can add custom premake5 CLI switches if required
+-- See: https://premake.github.io/docs/newoption/
+
 -- === Configuration ===
 -- Change the following lines to complete your setup
 
