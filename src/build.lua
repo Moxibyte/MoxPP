@@ -28,8 +28,9 @@ mox_cpp()
 --    None, used for header only projects (skipped during build)
 mox_console()
 
--- Make sure to give each project a unique GUID (For example generated here: https://www.famkruithof.net/uuid/uuidgen)
+-- Make sure to give each project a unique GUID
 -- The UUID is important for VisualStudio projects
+-- You can generate a UUID by running `mox generate_uuid` or `./mox.sh generate_uuid` respective.
 uuid("d54bdce0-8b62-11f0-b558-0800200c9a66")
 
 -- Please uncomment the following line when you create a shared or static lib, that is required for the unittest
