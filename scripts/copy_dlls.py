@@ -85,7 +85,7 @@ def copy_binaries(source_root, debug_dest, release_dest, conan_arch):
 
 if __name__ == "__main__":
     # Cli
-    p = argparse.ArgumentParser(prog="copydlls.py", allow_abbrev=False)
+    p = argparse.ArgumentParser(prog="copy_dlls.py", allow_abbrev=False)
     p.add_argument("arch", nargs="?", default=platform.machine().lower(), help="Alternative (cross compile) architecture")
     args = p.parse_args()
 

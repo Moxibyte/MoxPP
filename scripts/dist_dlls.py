@@ -37,7 +37,7 @@ def file_hash(path):
     return h.hexdigest()
 
 if __name__ == "__main__":
-    p = argparse.ArgumentParser(prog="distdlls.py", allow_abbrev=False)
+    p = argparse.ArgumentParser(prog="dist_dlls.py", allow_abbrev=False)
     p.add_argument("src", help="Source path")
     p.add_argument("dst", help="Destination path")
     args = p.parse_args()

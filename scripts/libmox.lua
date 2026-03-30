@@ -190,9 +190,9 @@ function mox_project(name, output_name)
 
                 filter { "configurations:" .. conf, "kind:ConsoleApp or WindowedApp" }
                     if is_debug and not hmox_conan_release_only then
-                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Debug-" .. _OPTIONS["mox_premake_arch"] .. " %{cfg.targetdir}")
+                        mox_runpy_postbuild("dist_dlls %{wks.location}/dlls/Debug-" .. _OPTIONS["mox_premake_arch"] .. " %{cfg.targetdir}")
                     else
-                        mox_runpy_postbuild("distdlls %{wks.location}/dlls/Release-" .. _OPTIONS["mox_premake_arch"] .. " %{cfg.targetdir}")
+                        mox_runpy_postbuild("dist_dlls %{wks.location}/dlls/Release-" .. _OPTIONS["mox_premake_arch"] .. " %{cfg.targetdir}")
                     end
                 filter {}
             end

@@ -141,7 +141,7 @@ if __name__ == '__main__':
         # Copy conan dlls
         subprocess.run((
             sys.executable,
-            './scripts/copydlls.py',
+            './scripts/copy_dlls.py',
             arch
         ))
         # Fix conan include for maxos
