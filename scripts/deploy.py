@@ -4,7 +4,7 @@ Add your own code to the main "function"
 
 The script is by default called with "Release" in the first argument
 
-Copyright (c) 2025 Moxibyte GmbH
+Copyright (c) 2026 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-import mox
 import os
+import mox
 import sys
 import zipfile
 import platform
@@ -39,6 +39,7 @@ if __name__ == '__main__':
     args = p.parse_args()
 
     # Detect version and architecture
+    appName = mox.ExtractLuaDef("./mox.lua", "cmox_product_name")
     version = mox.GetAppVersion()
     arch = mox.GetPlatformInfo(args.arch)["premake_arch"]
     build_folder = f'./build/{arch}-{args.conf}'
@@ -48,11 +49,12 @@ if __name__ == '__main__':
 
     # Simple zip archive with the software (dumb copy)
     # Also add the msvc redists via "AddMSVCRedists" call (does nothing is not on windows!)
-    zipArchive = mox.MDZip(mox.AutomaticFilename("moxpp", version, args.conf, args.arch, "zip"))
+    zipArchive = mox.MDZip(mox.AutomaticFilename(f"{appName}", version, args.conf, args.arch, "zip"))
     zipArchive.AddFolder(f'{build_folder}/bin', '')
-    # zipArchive.AddMSVCRedists() <-- Add this when you want to distribute redists. REMARK: This will include latest redists (most recent install visual studio)
+    zipArchive.AddFile("./LICENSE.html", "LICENSE.html")
+    # zipArchive.AddMSVCRedists() <-- Add this when you want to distribute redists. REMARK: This will include latest redists (most recent install visual studio). Please make sure you check licensing
     zipArchive.Deploy()
 
     # Source archive
-    srcArchive = mox.MDSrc(mox.AutomaticFilename("moxpp_src", version, args.conf, args.arch, "zip"))
+    srcArchive = mox.MDSrc(mox.AutomaticFilename(f"{appName}_src", version, args.conf, args.arch, "zip"))
     srcArchive.Deploy()

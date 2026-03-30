@@ -164,3 +164,19 @@ if __name__ == '__main__':
         '--file=./scripts/premake5.lua',
         premakeGenerator
     ))
+
+    # Run license generator
+    projectName = mox.ExtractLuaDef("./mox.lua", "cmox_product_name")
+    subprocess.run((
+        sys.executable,
+        "./scripts/generate_licenses.py",
+        "--project-name", projectName,
+        # Change this if you don't use default LICENSE path/naming:
+        "--project-license", "./LICENSE", 
+        # Uncomment this if you dont need a disclaimer or write your own:
+        # "--disclaimer", "",
+        # You can add a custom "./license.yml" file to describe non conan licenses (see scripts\generate_licenses.py for the file format)
+        # "--additional-licenses", "./license.yml",
+        # Change this to output to a different file 
+        # "--output", "./LICENSE.html", 
+    ))
