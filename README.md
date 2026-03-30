@@ -40,6 +40,25 @@ After you used this template for creating your new project please make sure to f
 
 **There is more information in** `BUILDING.md` **(That you should keep) on how to build the project.**
 
+## Claude Code Integration
+
+MoxPP ships with [Claude Code](https://claude.ai/code) skills to help you set up and extend your project. A `CLAUDE.md` file is included at the repository root — it gives Claude context about the MoxPP build system and, after running `/moxpp-setup`, will also contain your project's description and coding conventions. Claude Code reads this file automatically in every session.
+
+If you have Claude Code installed, you can use the following skills directly in your repository:
+
+### `/moxpp-setup`
+Guides you through the full initial configuration of this template for your project. Run this after cloning before you do anything else. It will:
+- Ask for your project name, description, C++ standard, architecture mode, and Conan dependencies
+- Update `mox.lua`, `src/build.lua`, and `conanfile.py` accordingly
+- Rewrite `CLAUDE.md` with your project's purpose and coding conventions, keeping the MoxPP reference as a subsection
+
+### `/moxpp-add-project`
+Adds a new sub-project (executable, library, or utility) to an existing MoxPP workspace. It will:
+- Ask for the project name, output type, language, and any inter-project dependencies
+- Generate a fresh UUID, create the project directory and `build.lua`, and add a starter source file
+- Update `conanfile.py` if new Conan packages are needed
+- Warn you if a change in project architecture (`single` → `flat`/`hierarchical`) is required
+
 **We have an extensive video that showcases how this template works: [https://youtu.be/u-2syomFD2s](https://youtu.be/u-2syomFD2s)** (This video is outdated by now. I will make a new one in the new future)
 
 ## License

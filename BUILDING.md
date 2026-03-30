@@ -68,3 +68,12 @@ The project provides the following actions. You can run them with the mox tool (
 - **graph**: Will generate a conan dependency-graph to a HTML file
 - **test**: Will run `init`, `build` (Release by default) and automatically invoke the `unittest` executable. The script will return the return code of the test application. Usage `./mox.bat/sh test [Debug/Release/...]`.
 Please note that `conf` is always indicating your projects configuration (as defined in `mox.lua`). While `arch` is the requested target architecture. If you don't supply arch it uses the native one of your system. Supply a different `arch` to cross-compile for a different CPU architecture.
+
+## Claude Code Integration
+
+MoxPP includes a `CLAUDE.md` file that gives [Claude Code](https://claude.ai/code) context about the build system. Claude Code reads this file automatically, so it understands the MoxPP project structure, `mox.lua` configuration, and `build.lua` API without any extra explanation.
+
+Two skills are available to assist with common tasks:
+
+- **`/moxpp-setup`** — Run once after cloning to configure the template for your project. Updates `mox.lua`, `src/build.lua`, `conanfile.py`, and `CLAUDE.md` based on your project name, architecture choice, and dependencies.
+- **`/moxpp-add-project`** — Adds a new sub-project (executable, library, or utility) to the workspace. Handles directory creation, `build.lua` generation, UUID assignment, and `conanfile.py` updates.
