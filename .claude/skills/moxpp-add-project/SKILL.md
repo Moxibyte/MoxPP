@@ -36,7 +36,7 @@ Ask the user for the following if not already provided via $ARGUMENTS:
 
 ### 3. Generate a UUID
 
-Run `mox generate_uuid` (Windows: `mox.bat generate_uuid`, Unix: `./mox.sh generate_uuid`) and capture the output for use in the new `build.lua`.
+Generate a UUID by running `python -c "import uuid; print(uuid.uuid4())"` via Bash and use the output in the new `build.lua`.
 
 ### 4. Create the project directory and `build.lua`
 
@@ -69,12 +69,12 @@ Uncomment and fill in only the sections that apply. Remove unused comment blocks
 ### 5. Create a starter source file
 
 For `console` and `windowed` projects: create `<project-dir>/main.cpp` with a minimal `main()` function.
-For `sharedlib` or `staticlib`: create `<project-dir>/<output_name>.h` and `<project-dir>/<output_name>.cpp` with an empty placeholder.
+For `sharedlib` or `staticlib`: create `<project-dir>/<output_name>.h` and `<project-dir>/<output_name>.cpp` with an empty placeholder. Also create `<project-dir>/dummy.cpp` containing a single empty translation unit (`// dummy`). This file is required on Windows — without at least one compiled `.cpp`, MSBuild will not produce a `.lib` output and any project that links against this one will fail to build.
 For `utility` or `none`: no source file needed.
 
-### 6. Update `conanfile.py` (if new Conan packages were requested)
+### 6. Update `conanfile.py` and `CLAUDE.md` (if new Conan packages were requested)
 
-Add the new `self.requires(...)` calls and any `self.options[...]` entries.
+Add the new `self.requires(...)` calls and any `self.options[...]` entries to `conanfile.py`. Then update the `## Conan Dependencies` section in `CLAUDE.md` to include the newly added packages.
 
 ### 7. Update `mox.lua` if needed
 

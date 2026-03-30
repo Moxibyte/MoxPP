@@ -73,7 +73,8 @@ Please note that `conf` is always indicating your projects configuration (as def
 
 MoxPP includes a `CLAUDE.md` file that gives [Claude Code](https://claude.ai/code) context about the build system. Claude Code reads this file automatically, so it understands the MoxPP project structure, `mox.lua` configuration, and `build.lua` API without any extra explanation.
 
-Two skills are available to assist with common tasks:
+Three skills are available to assist with common tasks:
 
 - **`/moxpp-setup`** — Run once after cloning to configure the template for your project. Updates `mox.lua`, `src/build.lua`, `conanfile.py`, and `CLAUDE.md` based on your project name, architecture choice, and dependencies.
 - **`/moxpp-add-project`** — Adds a new sub-project (executable, library, or utility) to the workspace. Handles directory creation, `build.lua` generation, UUID assignment, and `conanfile.py` updates.
+- **`/moxpp-check`** — Audits `CLAUDE.md` for drift against the actual project structure. Run after any change to `mox.lua`, `conanfile.py`, or `build.lua` files to keep `CLAUDE.md` accurate.

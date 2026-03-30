@@ -28,13 +28,17 @@ Edit the following fields in `mox.lua`:
 - `cmox_macro_prefix` → new macro prefix (must end with `_`)
 - `cmox_cpp_version` → confirmed C++ standard
 - `cmox_project_architecture` → chosen architecture mode
-- `cmox_unit_test_src` → `"test"` or `nil`
+- `cmox_unit_test_src` → `"test"` or `nil`. **If set to `nil`, also delete the `./test` directory at the repository root** — leaving it in place will cause stale project files and build errors.
 - In `cmox_function_setupworkspace()`: update `startproject` to match the new main project name (or remove the call if not applicable)
 
 ### 3. Rename the example project in `src/build.lua`
 
 - Change `mox_project("HelloWorld", "hello_world")` to use the new project name and a snake_case output name.
-- Generate a fresh UUID by running `mox generate_uuid` (Windows: `mox.bat generate_uuid`, Unix: `./mox.sh generate_uuid`) and replace the existing UUID in `src/build.lua`.
+- Update the output type to match what the user requested (e.g. `mox_console()`, `mox_sharedlib()`, etc.).
+- Generate a fresh UUID by running `python -c "import uuid; print(uuid.uuid4())"` via Bash and replace the existing UUID in `src/build.lua`.
+- **Source file management** (only for `single` architecture — for other architectures this is handled in step 5):
+  - If `sharedlib` or `staticlib`: delete `src/main.cpp`, create `src/<output_name>.h`, `src/<output_name>.cpp` (empty placeholders), and `src/dummy.cpp` (containing only `// dummy`). `dummy.cpp` is required on Windows — without at least one compiled `.cpp`, MSBuild will not produce a `.lib` and any dependent project will fail to build.
+  - If `console` or `windowed`: keep `src/main.cpp` as-is.
 
 ### 4. Update `conanfile.py`
 
@@ -45,8 +49,10 @@ Edit the following fields in `mox.lua`:
 
 ### 5. Adjust architecture layout (if not `single`)
 
-- **flat**: Create subdirectories under `src/` for each project. Move the existing `src/build.lua` and `src/main.cpp` into `src/<first-project-name>/`.
-- **hierarchical**: Create `src/<group>/<project>/` structure. Move existing files accordingly.
+- **flat**: Create `src/<first-project-name>/`. Move `src/build.lua` into it. Then apply source file management based on output type:
+  - If `console` or `windowed`: move `src/main.cpp` into the project directory.
+  - If `sharedlib` or `staticlib`: delete `src/main.cpp` and create `<project-dir>/<output_name>.h`, `<project-dir>/<output_name>.cpp` (empty placeholders), and `<project-dir>/dummy.cpp` (containing only `// dummy`).
+- **hierarchical**: Create `src/<group>/<project-name>/`. Move `src/build.lua` into it. Apply the same source file management rules as flat above, using the new project directory as the target.
 - **manual**: Remove the auto-discovery note and remind the user to implement `cmox_function_includeprojects()` in `mox.lua`.
 
 ### 6. Update `CLAUDE.md`
@@ -63,6 +69,9 @@ Required layout:
 <List the conventions the developer provided. If none were given, omit this section.>
 
 ## <Any other project-specific sections the developer wants Claude to know>
+
+## Conan Dependencies
+<Bulleted list of all active Conan packages in `<name>/<version>` format, with a one-line note on purpose if known. Keep this section up to date whenever conanfile.py changes.>
 
 ## MoxPP Build System
 <Existing MoxPP content verbatim, with all headings demoted one level>

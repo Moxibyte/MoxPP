@@ -2,6 +2,10 @@
 
 > This is an unconfigured MoxPP template. Run `/moxpp-setup` to replace this section with the actual project description, purpose, coding conventions, and any other context Claude needs to work effectively in this codebase.
 
+## Conan Dependencies
+
+> Not yet configured. Run `/moxpp-setup` to populate this section, or manually list the active packages below.
+
 ## MoxPP Build System
 
 MoxPP is a C++ project template that combines **Premake5** (meta-build system) and **Conan 2** (package manager). Premake5 generates platform-native build files (Visual Studio solutions on Windows, Makefiles on Linux, Xcode on macOS). Conan fetches and wires up C++ dependencies.
@@ -11,6 +15,8 @@ MoxPP is a C++ project template that combines **Premake5** (meta-build system) a
 All commands go through the launcher scripts:
 - **Windows:** `mox.bat <action> [args]`
 - **Linux/macOS:** `./mox.sh <action> [args]`
+
+> **Important for Claude:** Always run these commands with the working directory set to the repository root. Use the Bash tool with an explicit `cd` to the repo root before invoking, e.g.: `cd /path/to/repo && mox.bat <action>` (Windows) or `cd /path/to/repo && ./mox.sh <action>` (Linux/macOS). Never run mox from a subdirectory.
 
 Common actions:
 | Action | Description |
@@ -81,7 +87,7 @@ mox_staticlib()  -- Static library
 mox_utility()    -- Utility project (custom build actions, no code output)
 mox_none()       -- Header-only / no build output
 
--- 4. Set a unique UUID (required, generate with: mox generate_uuid)
+-- 4. Set a unique UUID (required, generate with: python -c "import uuid; print(uuid.uuid4())")
 uuid("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
 
 -- 5. Optional: mark this lib as a dependency for the unit test project

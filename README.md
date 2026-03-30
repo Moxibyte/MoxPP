@@ -59,6 +59,14 @@ Adds a new sub-project (executable, library, or utility) to an existing MoxPP wo
 - Update `conanfile.py` if new Conan packages are needed
 - Warn you if a change in project architecture (`single` → `flat`/`hierarchical`) is required
 
+### `/moxpp-check`
+Audits `CLAUDE.md` for drift against the actual project structure. Run this any time you've changed `mox.lua`, `conanfile.py`, or project `build.lua` files without updating `CLAUDE.md`. It will:
+- Compare the documented project name and description against `mox.lua` and `README.md`
+- Diff the `## Conan Dependencies` section against `conanfile.py`
+- Detect duplicate UUIDs across all `build.lua` files
+- Check for missing `dummy.cpp` in lib projects and orphaned `test/` directories
+- Propose all corrections with severity ratings before making any changes
+
 **We have an extensive video that showcases how this template works: [https://youtu.be/u-2syomFD2s](https://youtu.be/u-2syomFD2s)** (This video is outdated by now. I will make a new one in the new future)
 
 ## License
