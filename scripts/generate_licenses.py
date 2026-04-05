@@ -134,17 +134,29 @@ def discover_conan_licenses(dependencies_root: str | pathlib.Path) -> list[dict]
         )[-1]
         lib_version = latest_version_dir.name
 
-        # Use first platform found under Release/
-        release_dir = latest_version_dir / "Release"
-        if not release_dir.is_dir():
-            continue
+        # Use first platform found under Release/, Debug/ (compiled libs) or directly
+        # under the version dir (header-only libs that have no Debug/Release level)
+        for conf in ("Release", "Debug"):
+            if (latest_version_dir / conf).is_dir():
+                search_dir = latest_version_dir / conf
+                break
+        else:
+            search_dir = latest_version_dir
 
-        platform_dirs = [p for p in release_dir.iterdir() if p.is_dir()]
-        if not platform_dirs:
-            continue
-
-        licenses_dir = platform_dirs[0] / "licenses"
-        if not licenses_dir.is_dir():
+        # Use first platform subdir that contains a licenses/ folder, or fall
+        # back to search_dir itself (libs that omit the platform level)
+        platform_dirs = [p for p in search_dir.iterdir() if p.is_dir()]
+        licenses_dir = None
+        for p in platform_dirs:
+            candidate = p / "licenses"
+            if candidate.is_dir():
+                licenses_dir = candidate
+                break
+        if licenses_dir is None:
+            candidate = search_dir / "licenses"
+            if candidate.is_dir():
+                licenses_dir = candidate
+        if licenses_dir is None:
             continue
 
         # Collect all license files
