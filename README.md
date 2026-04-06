@@ -34,6 +34,7 @@ After you used this template for creating your new project please make sure to f
 - [ ] Revisit `BUILDING.md` and adjust it to your projects requirements. In case you modified any of the build steps (Scripts themselves), make sure to change `BUILDING.md` so that it's still correct.
 - [ ] Adding your own scripts: You can add your own python scripts by adding them to the `./scripts` folder. You can run the script with the mox tool `mox.bat <SCRIPT_NAME>` working dir is the repository root. Make sure to add your script to the list of actions in `BUILDING.md`.
 - [ ] Choosing your desired license. Make sure to add a license to the repository. All files that are copyright by us have already been marked with a license and thus are fine. This is no legal advice! Consult your lawyer!
+- [ ] If you need custom logic to run before or after each project build, edit `scripts/prebuild.py` and/or `scripts/postbuild.py`. Both are called automatically for every project on every build — no changes to any `.lua` file are needed. See **Pre/Post Build** section below.
 - [ ] If you ship third-party prebuilt binaries (DLLs, static libs) that Conan does not manage, create `./dependencies.yml` to describe them. `mox init` will download, extract, build, copy DLLs, and generate the Lua wiring automatically. See **External Dependencies** section below.
 - [ ] Check `./LICENSE.html` after running `mox init`. It is auto-generated from your `./LICENSE` file and all Conan dependency licenses. For non-Conan third-party libs, add a `./licenses.yml` and uncomment the `--additional-licenses` line in `scripts/init.py`.
 - [ ] Disable unit-testing when required. By default we provide a dummy unit test, we encourage the use of unit-tests! If you don't want them you can disable them in `mox.lua` and delete the `test` directory. You can also modify the building of unit tests or the library. MoxPP is shipped with gtest but has no hard requirements on it.
@@ -41,6 +42,24 @@ After you used this template for creating your new project please make sure to f
 - [ ] Now you can shall remove this readme file and replace it with your description of your project.
 
 **There is more information in** `BUILDING.md` **(That you should keep) on how to build the project.**
+
+## Pre/Post Build (`prebuild.py` / `postbuild.py`)
+
+MoxPP automatically runs `scripts/prebuild.py` before and `scripts/postbuild.py` after every project build. Both scripts are called with full context about the project being built:
+
+| Argument | Description |
+|----------|-------------|
+| `--project_name` | Name of the project |
+| `--project_path` | Path to the project source directory |
+| `--output_path` | Build output directory |
+| `--project_configuration` | Configuration name (e.g. `Debug`, `Release`) |
+| `--is_debug` | `"true"` or `"false"` |
+| `--project_architecture` | Architecture (e.g. `x86_64`, `ARM64`) |
+| `--project_kind` | Project type (e.g. `ConsoleApp`, `SharedLib`) |
+
+Add your custom logic directly to those two files. Use `args.project_name` or `args.project_kind` to target specific projects or output types. No `.lua` changes are needed or wanted.
+
+`postbuild.py` already handles DLL distribution — it copies from `./dlls/<Debug|Release>-<arch>/` into the output directory for executable project kinds.
 
 ## External Dependencies (`dependencies.yml`)
 

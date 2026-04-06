@@ -47,18 +47,6 @@ function mox_cli_mox_command(command)
     end
 end
 
--- For you usable helpers
-function mox_runpy_postbuild(command)
-    postbuildcommands {
-        mox_cli_mox_command(command)
-    }
-end
-function mox_runpy_prebuild(command)
-    prebuildcommands {
-        mox_cli_mox_command(command)
-    }
-end
-
 -- For you usable functions
 function mox_project(name, output_name)
     hmox_project_name = name
@@ -183,19 +171,15 @@ function mox_project(name, output_name)
             }
         filter {}
 
-        -- DLL Distribution
-        if cmox_copy_dlls then
-            for idx,conf in pairs(cmox_configurations_n) do
-                local is_debug = cmox_configurations_d[idx]
-
-                filter { "configurations:" .. conf, "kind:ConsoleApp or WindowedApp" }
-                    if is_debug and not hmox_conan_release_only then
-                        mox_runpy_postbuild("dist_dlls %{wks.location}/dlls/Debug-" .. _OPTIONS["mox_premake_arch"] .. " %{cfg.targetdir}")
-                    else
-                        mox_runpy_postbuild("dist_dlls %{wks.location}/dlls/Release-" .. _OPTIONS["mox_premake_arch"] .. " %{cfg.targetdir}")
-                    end
-                filter {}
-            end
+        -- Post-build (always wired for every configuration; postbuild.py decides what to do)
+        for idx,conf in pairs(cmox_configurations_n) do
+            local is_debug = cmox_configurations_d[idx]
+            -- When conan is release-only, debug configs still consume Release DLLs
+            local effective_debug = is_debug and not hmox_conan_release_only
+            filter { "configurations:" .. conf }
+                mox_runpy_postbuild(effective_debug)
+                mox_runpy_prebuild(effective_debug)
+            filter {}
         end
 
         -- Windows options
@@ -333,8 +317,25 @@ function mox_test_requirement()
     table.insert(hmox_test_requirements, hmox_project_name)
 end
 
-
 -- Internal functions
+-- path.translate(..., "/") ensures forward-slash separators so a trailing slash never
+-- produces the cmd.exe \" escaping bug (e.g. "C:\path\" eats the closing quote).
+function mox_runpy_postbuild(is_debug)
+    local flag = is_debug and "true" or "false"
+    postbuildcommands {
+        mox_cli_mox_command(
+            'postbuild --project_name "%{prj.name}" --project_path "%{path.translate(prj.location, "/")}" --output_path "%{path.translate(cfg.targetdir, "/")}" --project_configuration "%{cfg.buildcfg}" --is_debug ' .. flag .. ' --project_architecture "%{cfg.architecture}" --project_kind "%{cfg.kind}"'
+        )
+    }
+end
+function mox_runpy_prebuild(is_debug)
+    local flag = is_debug and "true" or "false"
+    prebuildcommands {
+        mox_cli_mox_command(
+            'prebuild --project_name "%{prj.name}" --project_path "%{path.translate(prj.location, "/")}" --output_path "%{path.translate(cfg.targetdir, "/")}" --project_configuration "%{cfg.buildcfg}" --is_debug ' .. flag .. ' --project_architecture "%{cfg.architecture}" --project_kind "%{cfg.kind}"'
+        )
+    }
+end
 function mox_add_conan_linking_step(conf)
     conan_setup_link(conf)
 end

@@ -3,8 +3,9 @@
 
 set -euo pipefail
 
-# Folder discovery
+# Folder discovery – and immediately cd there so all scripts see repo root as cwd
 SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" >/dev/null 2>&1 && pwd -P)"
+cd "$SCRIPT_DIR"
 
 # Ensure venv
 python3 "$SCRIPT_DIR/venv/venv.py"

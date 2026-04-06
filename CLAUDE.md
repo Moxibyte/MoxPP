@@ -31,6 +31,8 @@ Common actions:
 | `generate_uuid` | Print a new UUID for use in a build.lua |
 | `generate_licenses` | Create an HTML license compliance report (`./LICENSE.html`) |
 | `generate_moxpp_dependencies` | Process `dependencies.yml`: download/extract archives, run build scripts, copy DLLs into `dlls/`, emit `dependencies/dependencies.lua` |
+| `prebuild` | *(called automatically by the build system — not for direct use)* Pre-build hook; edit `scripts/prebuild.py` to add logic |
+| `postbuild` | *(called automatically by the build system — not for direct use)* Post-build hook; edit `scripts/postbuild.py` to add logic |
 | `graph` | Generate a Conan dependency graph |
 
 ### Configuration: `mox.lua`
@@ -97,11 +99,28 @@ mox_test_requirement()
 
 After these calls, any standard [Premake5 API](https://premake.github.io/docs) calls are valid (e.g. `links`, `dependson`, `includedirs`, `defines`).
 
-Helper functions available in `build.lua`:
-```lua
-mox_runpy_postbuild("action [args]")   -- Add a mox action as a post-build step
-mox_runpy_prebuild("action [args]")    -- Add a mox action as a pre-build step
-```
+### Pre-build and Post-build
+
+MoxPP automatically invokes `scripts/prebuild.py` and `scripts/postbuild.py` for every project on every build. To add custom logic, edit those scripts directly — no changes to any `.lua` file are needed or wanted.
+
+| Script | When it runs |
+|--------|-------------|
+| `scripts/prebuild.py` | Before each project build |
+| `scripts/postbuild.py` | After each project build (also handles DLL distribution) |
+
+Both scripts receive the following named arguments:
+
+| Argument | Example value | Description |
+|----------|--------------|-------------|
+| `--project_name` | `"MyApp"` | Premake5 project name |
+| `--project_path` | `"F:/repo/src/MyApp/"` | Path to the project source directory |
+| `--output_path` | `"F:/repo/build/x86_64-Debug/bin/"` | Build output directory |
+| `--project_configuration` | `"Debug"` | Active build configuration |
+| `--is_debug` | `"true"` / `"false"` | Whether this is a debug configuration |
+| `--project_architecture` | `"x86_64"` | Premake5 architecture string |
+| `--project_kind` | `"ConsoleApp"` | Premake5 project kind |
+
+Use `args.project_kind` to restrict logic to specific project types (e.g. only for `ConsoleApp` / `WindowedApp`). Use `args.project_name` to target a specific project.
 
 ### Auto-generated Preprocessor Macros
 
