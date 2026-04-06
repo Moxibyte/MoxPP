@@ -22,6 +22,7 @@
 
 include "libmox.lua"
 include "../dependencies/conandeps.premake5.lua"
+include "../dependencies/dependencies.lua"
 include "../mox.lua"
 
 hmox_test_requirements = {}

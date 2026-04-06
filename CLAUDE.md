@@ -29,7 +29,8 @@ Common actions:
 | `deploy` | Package binaries and sources into ZIPs |
 | `autogen` | Full pipeline: init → build → deploy |
 | `generate_uuid` | Print a new UUID for use in a build.lua |
-| `generate_licenses` | Create an HTML license compliance report |
+| `generate_licenses` | Create an HTML license compliance report (`./LICENSE.html`) |
+| `generate_moxpp_dependencies` | Process `dependencies.yml`: download/extract archives, run build scripts, copy DLLs into `dlls/`, emit `dependencies/dependencies.lua` |
 | `graph` | Generate a Conan dependency graph |
 
 ### Configuration: `mox.lua`
@@ -133,6 +134,62 @@ self.options["spdlog"].shared = True
 ```
 
 After editing `conanfile.py`, re-run `mox init` to regenerate project files.
+
+### External Dependencies: `dependencies.yml`
+
+For libraries that cannot be managed by Conan (prebuilt binaries, header-only zips, custom-built libs), create `./dependencies.yml` at the repository root. It is processed automatically during `mox init` and can be run standalone with `mox generate_moxpp_dependencies`.
+
+**YAML structure:**
+```yaml
+dependencies:
+  - download: <url>        # optional – archive fetched and extracted into folder
+    folder:   <local-dir>  # path relative to repo root
+    build:    <script.py>  # optional – Python script run after extraction (repo root cwd)
+    # Every section below is optional.
+    # Each section accepts: include_dirs, lib_dirs, links, defines, copy_dll
+    all:                   # applied unconditionally
+    debug:                 # applied when is_debug == true
+    release:               # applied when is_debug == false
+    # Architecture-qualified variants (merged into the plain section at generation time):
+    all_x86_64:            # merged into 'all' when --arch resolves to x86_64
+    debug_x86_64:          # merged into 'debug' when --arch resolves to x86_64
+    release_x86_64:        # … likewise for x86, ARM, ARM64 (premake5 arch names)
+```
+
+`include_dirs` and `lib_dirs` paths are relative to `folder` and are automatically prefixed with `%{wks.location}/<folder>/` in the generated Lua. `links` and `defines` are emitted as-is.
+
+**`copy_dll`** — list of paths relative to `folder`; files are flat-copied (filename only, no subdirectory) to:
+
+| Section | Destination |
+|---------|-------------|
+| `all` / `all_<arch>` | `./dlls/Debug-<arch>/` **and** `./dlls/Release-<arch>/` |
+| `debug` / `debug_<arch>` | `./dlls/Debug-<arch>/` only |
+| `release` / `release_<arch>` | `./dlls/Release-<arch>/` only |
+
+**Generated output** — `./dependencies/dependencies.lua` is included automatically by `scripts/premake5.lua` and exposes two functions:
+```lua
+moxpp_dependencies_build(conf, is_debug)  -- applies includedirs + defines, gated by conf filter
+moxpp_dependencies_link(conf, is_debug)   -- applies libdirs + links, gated by conf filter
+```
+Call them from `cmox_function_setupproject()` in `mox.lua`, or directly inside a project's `build.lua` after `mox_cpp()` / `mox_console()` / etc.
+
+### License Report: `generate_licenses` / `licenses.yml`
+
+`scripts/generate_licenses.py` is run automatically at the end of `mox init`. It collects:
+1. The project's own license from `./LICENSE`.
+2. All Conan dependency licenses from `./dependencies/full_deploy/`.
+3. Any additional non-Conan licenses from an optional `./licenses.yml` file.
+
+**`licenses.yml` format** (place at repo root, pass via `--additional-licenses` in `init.py`):
+```yaml
+additional_licenses:
+  - name: MyLib
+    version: 1.0.0
+    license_files:
+      - ./path/to/LICENSE.txt
+```
+
+Output is written to `./LICENSE.html`.
 
 ### Build Output Layout
 

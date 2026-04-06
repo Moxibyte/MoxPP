@@ -245,6 +245,10 @@ function mox_c()
     language "C"
 
     mox_add_conan_building()
+    for idx,conf in pairs(cmox_configurations_n) do
+        local is_debug = cmox_configurations_d[idx]     
+        moxpp_dependencies_build(conf, is_debug)
+    end
 end
 function mox_cs(dotnet)
     if dotnet==nil then
@@ -259,6 +263,10 @@ function mox_cpp(cppstd)
     cppdialect(cmox_cpp_version)
     
     mox_add_conan_building()
+    for idx,conf in pairs(cmox_configurations_n) do
+        local is_debug = cmox_configurations_d[idx]     
+        moxpp_dependencies_build(conf, is_debug)
+    end
 end
 function mox_console()
     kind "ConsoleApp"
@@ -268,6 +276,10 @@ function mox_console()
     }
     linkgroups "On"
     mox_add_conan_linking()
+    for idx,conf in pairs(cmox_configurations_n) do
+        local is_debug = cmox_configurations_d[idx]     
+        moxpp_dependencies_link(conf, is_debug)
+    end
 end
 function mox_windowed()
     kind "WindowedApp"
@@ -277,6 +289,10 @@ function mox_windowed()
     }
     linkgroups "On"
     mox_add_conan_linking()
+    for idx,conf in pairs(cmox_configurations_n) do
+        local is_debug = cmox_configurations_d[idx]     
+        moxpp_dependencies_link(conf, is_debug)
+    end
 end
 function mox_sharedlib()
     kind "SharedLib"
@@ -286,6 +302,10 @@ function mox_sharedlib()
     }
     linkgroups "On"
     mox_add_conan_linking()
+    for idx,conf in pairs(cmox_configurations_n) do
+        local is_debug = cmox_configurations_d[idx]     
+        moxpp_dependencies_link(conf, is_debug)
+    end
 end
 function mox_staticlib()
     kind "StaticLib"

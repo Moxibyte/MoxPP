@@ -2,3 +2,4 @@ conan==2.24.0
 python-certifi-win32==1.6.1; sys_platform == "win32"
 markdown==3.10.2
 pygments==2.20.0
+pyyaml>=6.0

@@ -34,11 +34,54 @@ After you used this template for creating your new project please make sure to f
 - [ ] Revisit `BUILDING.md` and adjust it to your projects requirements. In case you modified any of the build steps (Scripts themselves), make sure to change `BUILDING.md` so that it's still correct.
 - [ ] Adding your own scripts: You can add your own python scripts by adding them to the `./scripts` folder. You can run the script with the mox tool `mox.bat <SCRIPT_NAME>` working dir is the repository root. Make sure to add your script to the list of actions in `BUILDING.md`.
 - [ ] Choosing your desired license. Make sure to add a license to the repository. All files that are copyright by us have already been marked with a license and thus are fine. This is no legal advice! Consult your lawyer!
+- [ ] If you ship third-party prebuilt binaries (DLLs, static libs) that Conan does not manage, create `./dependencies.yml` to describe them. `mox init` will download, extract, build, copy DLLs, and generate the Lua wiring automatically. See **External Dependencies** section below.
+- [ ] Check `./LICENSE.html` after running `mox init`. It is auto-generated from your `./LICENSE` file and all Conan dependency licenses. For non-Conan third-party libs, add a `./licenses.yml` and uncomment the `--additional-licenses` line in `scripts/init.py`.
 - [ ] Disable unit-testing when required. By default we provide a dummy unit test, we encourage the use of unit-tests! If you don't want them you can disable them in `mox.lua` and delete the `test` directory. You can also modify the building of unit tests or the library. MoxPP is shipped with gtest but has no hard requirements on it.
 - [ ] Verify the usage of GitHub actions. We provide GitHub actions that build and test the codebase. Please make sure to delete the workflow files or disable action, in case you don't want to uses them!
 - [ ] Now you can shall remove this readme file and replace it with your description of your project.
 
 **There is more information in** `BUILDING.md` **(That you should keep) on how to build the project.**
+
+## External Dependencies (`dependencies.yml`)
+
+For prebuilt or custom-built libraries that Conan cannot manage, create `./dependencies.yml` at the repository root. It is processed automatically by `mox init`.
+
+```yaml
+dependencies:
+  - download: https://example.com/mylib-1.0.zip   # optional – downloaded and extracted
+    folder:   dependencies/mylib                   # local path relative to repo root
+    build:    scripts/build_mylib.py               # optional – Python script to run after extraction
+    all:                    # settings for all configurations
+      include_dirs: [include]
+      lib_dirs:     [lib]
+      links:        [mylib]
+      copy_dll:     [bin/mylib.dll]
+    debug:                  # extra settings for debug only
+      lib_dirs:     [lib/debug]
+      links:        [mylibd]
+    release_x86_64:         # arch-qualified: merged into 'release' when targeting x86_64
+      lib_dirs:     [lib/x64/release]
+```
+
+- `include_dirs` and `lib_dirs` are relative to `folder` and automatically prefixed with the workspace root in the generated Lua.
+- `copy_dll` performs a flat copy (filename only) of the listed files into `./dlls/Debug-<arch>/` or `./dlls/Release-<arch>/` depending on the section (`all` → both, `debug`/`release` → respective).
+- Architecture-qualified sections (`all_x86_64`, `debug_ARM`, …) are merged into the plain sections at generation time using the `--arch` passed by `mox init`.
+
+The generated `./dependencies/dependencies.lua` exposes `moxpp_dependencies_build(conf, is_debug)` and `moxpp_dependencies_link(conf, is_debug)` which you can call from `cmox_function_setupproject()` in `mox.lua` or from individual `build.lua` files.
+
+## License Report (`generate_licenses` / `licenses.yml`)
+
+`mox init` automatically generates `./LICENSE.html` from your project license (`./LICENSE`) and all Conan dependency licenses. To include additional non-Conan third-party licenses, create `./licenses.yml`:
+
+```yaml
+additional_licenses:
+  - name: MyLib
+    version: 1.0.0
+    license_files:
+      - ./dependencies/mylib/LICENSE.txt
+```
+
+Then uncomment the `--additional-licenses` line in `scripts/init.py`.
 
 ## Claude Code Integration
 
