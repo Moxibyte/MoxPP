@@ -5,9 +5,10 @@ This is how an additional licenses.yml file may look like:
 > additional_licenses:
 >   - name: MyLib
 >     version: 1.0.0
->     license_files: [
->       "./path_to_license/file.txt",
->     ]
+>     license_files:
+>       - "./path_to_license/LICENSE.txt"   # exact path
+>       - "./vendor/mylib/LICENSE*"         # wildcard filename
+>       - "./third_party/**/LICENSE"        # recursive glob
 
 Copyright (c) 2026 Moxibyte GmbH
 
@@ -30,6 +31,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+import glob
+import html
 import yaml
 import pathlib
 import markdown
@@ -82,6 +85,12 @@ def make_project_license(name: str, disclaimer: str, license_text: str) -> dict:
 def make_third_party_lib(name: str, version: str, licenses: dict[str, str]) -> dict:
     return {"name": name, "version": version, "licenses": licenses}
 
+def _license_pre(text: str) -> str:
+    """Wrap license text in an HTML <pre> block with all special chars escaped.
+    Using raw HTML instead of markdown fenced code blocks avoids any breakage
+    when the license text itself contains backticks or other markdown syntax."""
+    return f"<pre><code>{html.escape(text.strip())}</code></pre>"
+
 def build_markdown(project: dict, third_party: list[dict]) -> str:
     sections = []
 
@@ -89,7 +98,7 @@ def build_markdown(project: dict, third_party: list[dict]) -> str:
     if project["disclaimer"]:
         sections.append(project['disclaimer'])
     sections.append("## License")
-    sections.append(f"```\n{project['license_text'].strip()}\n```")
+    sections.append(_license_pre(project['license_text']))
 
     sections.append("## Third-Party Licenses")
 
@@ -97,11 +106,11 @@ def build_markdown(project: dict, third_party: list[dict]) -> str:
         sections.append(f"### {lib['name']} (Version {lib['version']})")
         for filename, license_text in lib["licenses"].items():
             sections.append(f"#### {filename}")
-            sections.append(f"```\n{license_text.strip()}\n```")
+            sections.append(_license_pre(license_text))
 
     # You are NOT obligated to keep this! But it would be nice :-)
-    # Please make sure you read an understand the discalaimer
-    sections.append("*Powered by [MoxPP C++ Template](https://github.com/Moxibyte/MoxPP) by Moxibyte GmbH*<br/>*Moxibyte GmbH is not liable for the correctness of this file if not distributed by Moxibyte GmbH. The correctness needs to be assured by the final entity redistributing the external lib(s)! This is not legal advice!*")
+    # Please make sure you read and understand the disclaimer
+    sections.append("*Powered by [MoxPP C++ Template](https://github.com/Moxibyte/MoxPP) by Moxibyte GmbH*<br/>*Moxibyte GmbH is not liable for the correctness of this file if not distributed by Moxibyte GmbH. The correctness needs to be ensured by the final entity redistributing software using external lib(s). This is not legal advice!*")
 
     return "\n\n".join(sections)
 
@@ -175,6 +184,15 @@ def discover_conan_licenses(dependencies_root: str | pathlib.Path) -> list[dict]
 
     return third_party
 
+def _expand_license_pattern(pattern: str) -> list[pathlib.Path]:
+    """Expand a glob pattern to a sorted list of matching files.
+    Falls back to treating the string as a literal path when no glob hits."""
+    matched = sorted(glob.glob(pattern, recursive=True))
+    if matched:
+        return [p for m in matched if (p := pathlib.Path(m)).is_file()]
+    p = pathlib.Path(pattern)
+    return [p] if p.is_file() else []
+
 def load_additional_licenses(control_file: str | pathlib.Path) -> list[dict] | None:
     control_file = pathlib.Path(control_file)
 
@@ -194,10 +212,10 @@ def load_additional_licenses(control_file: str | pathlib.Path) -> list[dict] | N
         name    = entry["name"]
         version = str(entry["version"])
 
-        license_files = {
-            pathlib.Path(p).name: pathlib.Path(p).read_text(encoding="utf-8", errors="replace")
-            for p in entry.get("license_files", [])
-        }
+        license_files = {}
+        for pattern in entry.get("license_files", []):
+            for path in _expand_license_pattern(pattern):
+                license_files[path.name] = path.read_text(encoding="utf-8", errors="replace")
 
         if not license_files:
             continue
