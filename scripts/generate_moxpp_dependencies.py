@@ -154,7 +154,7 @@ def _flatten_dep(dep, premake_arch):
 
 
 def _copy_dlls(dep, premake_arch):
-    """Copy DLLs declared under copy_dll into ./dlls/<Conf>-<arch>/ (flat, filename only)."""
+    """Copy files/folders declared under copy_dll/folder_copy into ./dlls/<Conf>-<arch>/."""
     folder = dep.get('folder', '.')
 
     # Map each section to the conf folders it feeds into
@@ -168,8 +168,10 @@ def _copy_dlls(dep, premake_arch):
     }
 
     for section_name, confs in section_to_confs.items():
-        dlls = (dep.get(section_name) or {}).get('copy_dll') or []
-        for dll_rel in dlls:
+        section = dep.get(section_name) or {}
+
+        # Flat file copy (filename only, no subdirectory)
+        for dll_rel in section.get('copy_dll') or []:
             src = os.path.join(folder, dll_rel)
             if not os.path.isfile(src):
                 print(f'  Warning: DLL not found: {src}')
@@ -181,6 +183,18 @@ def _copy_dlls(dep, premake_arch):
                 dst = os.path.join(dst_dir, filename)
                 print(f'  Copying {src} -> {dst}')
                 shutil.copy2(src, dst)
+
+        # Recursive folder copy (preserves hierarchy under the folder's own name)
+        for folder_rel in section.get('folder_copy') or []:
+            src = os.path.join(folder, folder_rel)
+            if not os.path.isdir(src):
+                print(f'  Warning: folder not found: {src}')
+                continue
+            dirname = os.path.basename(folder_rel.rstrip('/\\'))
+            for conf in confs:
+                dst_dir = os.path.join(f'./dlls/{conf}-{premake_arch}', dirname)
+                print(f'  Copying folder {src} -> {dst_dir}')
+                shutil.copytree(src, dst_dir, dirs_exist_ok=True)
 
 # ---------------------------------------------------------------------------
 # Lua templates

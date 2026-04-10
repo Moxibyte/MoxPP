@@ -165,7 +165,7 @@ dependencies:
     folder:   <local-dir>  # path relative to repo root
     build:    <script.py>  # optional – Python script run after extraction (repo root cwd)
     # Every section below is optional.
-    # Each section accepts: include_dirs, lib_dirs, links, defines, copy_dll
+    # Each section accepts: include_dirs, lib_dirs, links, defines, copy_dll, folder_copy
     all:                   # applied unconditionally
     debug:                 # applied when is_debug == true
     release:               # applied when is_debug == false
@@ -184,6 +184,8 @@ dependencies:
 | `all` / `all_<arch>` | `./dlls/Debug-<arch>/` **and** `./dlls/Release-<arch>/` |
 | `debug` / `debug_<arch>` | `./dlls/Debug-<arch>/` only |
 | `release` / `release_<arch>` | `./dlls/Release-<arch>/` only |
+
+**`folder_copy`** — list of directory paths relative to `folder`; each directory is recursively copied into `./dlls/<Conf>-<arch>/` preserving the full hierarchy under the source folder's own name. Same section-to-destination mapping as `copy_dll`. Use for assets, shaders, or any multi-file tree that must keep its internal structure.
 
 **Generated output** — `./dependencies/dependencies.lua` is included automatically by `scripts/premake5.lua` and exposes two functions:
 ```lua
@@ -206,7 +208,13 @@ additional_licenses:
     version: 1.0.0
     license_files:
       - ./path/to/LICENSE.txt
+
+strip_licenses:
+  - lib:  SomeDep    # must match the lib name exactly
+    file: LICENSE.md # filename to remove from that lib's license list
 ```
+
+`strip_licenses` removes individual license files from a lib's report entry. If all files for a lib are stripped it is dropped from the report entirely.
 
 Output is written to `./LICENSE.html`.
 

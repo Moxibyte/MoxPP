@@ -45,40 +45,31 @@ if __name__ == "__main__":
     src = Path(args.src).resolve()
     dst = Path(args.dst).resolve()
 
-    print(os.getcwd())
-
     if not src.is_dir():
         print(f"Error: Source directory '{src}' does not exist.")
         sys.exit(1)
 
-    pf = platform.system().lower()
-    ext = None
-    if pf == "windows":
-        ext = ".dll"
-    elif pf == "darwin":
-        ext = ".dylib"
-    else:
-        ext = ".so*"
-
-    for binary_file in src.glob(f"*{ext}"):
-        dest_file = dst / binary_file.name
+    def _copy_file(src_file, dest_file):
+        """Copy one file, preserving symlinks on POSIX."""
         dest_file.parent.mkdir(parents=True, exist_ok=True)
-
         if dest_file.exists():
-            continue
-
-        if os.name == "nt" or not binary_file.is_symlink():
-            shutil.copy2(binary_file, dest_file)
-            print(f"Copied {binary_file} -> {dest_file}")
-            continue
-
+            return
+        if os.name == "nt" or not src_file.is_symlink():
+            shutil.copy2(src_file, dest_file)
+            print(f"Copied {src_file} -> {dest_file}")
+            return
         # POSIX + symlink: try to recreate the link; if not possible, materialize it
-        link_text = os.readlink(binary_file)  # keep relative target if it was relative
+        link_text = os.readlink(src_file)
         try:
             if dest_file.exists() or dest_file.is_symlink():
                 dest_file.unlink()
             os.symlink(link_text, dest_file)
-            print(f"Linked {binary_file} -> {dest_file} ({link_text})")
+            print(f"Linked {src_file} -> {dest_file} ({link_text})")
         except OSError:
-            shutil.copy2(binary_file.resolve(), dest_file)
-            print(f"Copied (materialized) {binary_file} -> {dest_file}")
+            shutil.copy2(src_file.resolve(), dest_file)
+            print(f"Copied (materialized) {src_file} -> {dest_file}")
+
+    # Mirror entire src tree into dst, preserving hierarchy
+    for src_file in src.rglob("*"):
+        if src_file.is_file():
+            _copy_file(src_file, dst / src_file.relative_to(src))

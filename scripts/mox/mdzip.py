@@ -2,7 +2,7 @@
 MDZip - MoxPP Deploy
 Packes into a zip file
 
-Copyright (c) 2025 Moxibyte GmbH
+Copyright (c) 2026 Moxibyte GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,10 +38,11 @@ class MDZip:
         self.__files.append((file, name))
 
     def AddFolder(self, folder, name):
-        for file in os.listdir(folder):
-            path = f'{folder}/{file}'
-            if os.path.isfile(path):
-                self.AddFile(path, f'{name}/{file}')
+        for root, dirs, files in os.walk(folder):
+            rel = os.path.relpath(root, folder)
+            arc_dir = name if rel == '.' else f'{name}/{rel}'
+            for file in files:
+                self.AddFile(os.path.join(root, file), f'{arc_dir}/{file}')
 
     def AddMSVCRedists(self, vsVersion=None):
         if sys.platform.startswith('win'):

@@ -23,8 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import moxwin
+import mox
 
+import os
 import re
+import sys
 import glob
 import argparse
 import platform
@@ -69,7 +72,7 @@ def MacosBuild(conf):
     ), text=True)
     schemesString = re.search(r"Schemes:\s*(.*)", schemesCall, re.M | re.S).group(1)
     schemes = re.findall(r"\S+", schemesString)
-    
+
     # Build
     for scheme in schemes:
         subprocess.run((
@@ -79,6 +82,16 @@ def MacosBuild(conf):
             '-configuration', conf,
             'build'
         ))
+
+    # Distribute dylibs into the build output directory.
+    # The xcode4 postbuild hook may not fire correctly in all Premake5 versions,
+    # so we ensure distribution happens here as well.
+    arch_info = mox.GetThisPlatformInfo()
+    premake_arch = arch_info['premake_arch']
+    dlls_src = os.path.join('.', 'dlls', f'{conf}-{premake_arch}')
+    output_dir = os.path.join('.', 'build', f'{premake_arch}-{conf}', 'bin')
+    if os.path.isdir(dlls_src) and os.path.isdir(output_dir):
+        subprocess.run([sys.executable, './scripts/dist_dlls.py', dlls_src, output_dir], check=False)
 
 if __name__ == '__main__':
     # Configuration from cli

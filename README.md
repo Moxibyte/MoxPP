@@ -74,7 +74,8 @@ dependencies:
       include_dirs: [include]
       lib_dirs:     [lib]
       links:        [mylib]
-      copy_dll:     [bin/mylib.dll]
+      copy_dll:     [bin/mylib.dll]       # flat copy – filename only, no subdirectory
+      folder_copy:  [bin/shaders]         # recursive copy – preserves hierarchy under folder name
     debug:                  # extra settings for debug only
       lib_dirs:     [lib/debug]
       links:        [mylibd]
@@ -84,13 +85,14 @@ dependencies:
 
 - `include_dirs` and `lib_dirs` are relative to `folder` and automatically prefixed with the workspace root in the generated Lua.
 - `copy_dll` performs a flat copy (filename only) of the listed files into `./dlls/Debug-<arch>/` or `./dlls/Release-<arch>/` depending on the section (`all` → both, `debug`/`release` → respective).
+- `folder_copy` copies an entire directory tree into `./dlls/<Conf>-<arch>/`, preserving the hierarchy under the source folder's own name. Use this for assets, shader packs, or any multi-file tree that must keep its internal structure at runtime.
 - Architecture-qualified sections (`all_x86_64`, `debug_ARM`, …) are merged into the plain sections at generation time using the `--arch` passed by `mox init`.
 
 The generated `./dependencies/dependencies.lua` exposes `moxpp_dependencies_build(conf, is_debug)` and `moxpp_dependencies_link(conf, is_debug)` which you can call from `cmox_function_setupproject()` in `mox.lua` or from individual `build.lua` files.
 
 ## License Report (`generate_licenses` / `licenses.yml`)
 
-`mox init` automatically generates `./LICENSE.html` from your project license (`./LICENSE`) and all Conan dependency licenses. To include additional non-Conan third-party licenses, create `./licenses.yml`:
+`mox init` automatically generates `./LICENSE.html` from your project license (`./LICENSE`) and all Conan dependency licenses. To include additional non-Conan third-party licenses, or to strip unwanted license files from the report, create `./licenses.yml`:
 
 ```yaml
 additional_licenses:
@@ -98,7 +100,14 @@ additional_licenses:
     version: 1.0.0
     license_files:
       - ./dependencies/mylib/LICENSE.txt
+
+strip_licenses:
+  - lib:  SomeDep      # must match the lib name exactly
+    file: LICENSE.md   # filename to remove from that lib's license list
 ```
+
+- `additional_licenses` adds license entries for libraries not managed by Conan.
+- `strip_licenses` removes specific license files from a lib's entry. If all files are stripped the lib is dropped from the report entirely. Useful when a Conan package bundles extra license files that are not applicable to your use.
 
 Then uncomment the `--additional-licenses` line in `scripts/init.py`.
 

@@ -9,6 +9,10 @@ This is how an additional licenses.yml file may look like:
 >       - "./path_to_license/LICENSE.txt"   # exact path
 >       - "./vendor/mylib/LICENSE*"         # wildcard filename
 >       - "./third_party/**/LICENSE"        # recursive glob
+>
+> strip_licenses:
+>   - lib: <lib-name>     # must match the lib name exactly
+>     file: <filename>    # filename to remove from that lib's license list
 
 Copyright (c) 2026 Moxibyte GmbH
 
@@ -224,6 +228,32 @@ def load_additional_licenses(control_file: str | pathlib.Path) -> list[dict] | N
 
     return third_party or None
 
+def load_strip_licenses(control_file: str | pathlib.Path) -> list[dict] | None:
+    control_file = pathlib.Path(control_file)
+    if not control_file.is_file():
+        return None
+    with control_file.open(encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    entries = data.get("strip_licenses") if data else None
+    return entries or None
+
+def apply_strip_licenses(third_party: list[dict], strips: list[dict]) -> list[dict]:
+    for strip in strips:
+        lib_name  = strip["lib"]
+        file_name = strip["file"]
+        for lib in third_party:
+            if lib["name"] == lib_name:
+                if file_name in lib["licenses"]:
+                    del lib["licenses"][file_name]
+                    print(f"  Stripped '{file_name}' from '{lib_name}'")
+                else:
+                    print(f"  Warning: '{file_name}' not found in '{lib_name}' — skipping strip")
+                break
+        else:
+            print(f"  Warning: lib '{lib_name}' not found — skipping strip")
+    # Drop libs whose entire license set was stripped away
+    return [lib for lib in third_party if lib["licenses"]]
+
 if __name__ == "__main__":
     # CLI Setup
     p = argparse.ArgumentParser(
@@ -271,11 +301,13 @@ if __name__ == "__main__":
 
     # Third party
     third_party = discover_conan_licenses("./dependencies")
-    additional = None
     if additional_licenses and additional_licenses.exists():
         additional = load_additional_licenses(additional_licenses)
-    if additional:
-        third_party.extend(additional)
+        if additional:
+            third_party.extend(additional)
+        strips = load_strip_licenses(additional_licenses)
+        if strips:
+            third_party = apply_strip_licenses(third_party, strips)
 
     # Build license
     html = build_license_html(project, third_party)
