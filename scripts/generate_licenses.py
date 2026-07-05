@@ -217,9 +217,21 @@ def load_additional_licenses(control_file: str | pathlib.Path) -> list[dict] | N
         version = str(entry["version"])
 
         license_files = {}
+        seen_paths = set()
         for pattern in entry.get("license_files", []):
             for path in _expand_license_pattern(pattern):
-                license_files[path.name] = path.read_text(encoding="utf-8", errors="replace")
+                # Same file matched by several patterns → only include it once
+                resolved = path.resolve()
+                if resolved in seen_paths:
+                    continue
+                seen_paths.add(resolved)
+                # Key by filename; on collision (e.g. many LICENSE files from a
+                # recursive glob) fall back to the full relative path so no
+                # matched license silently overwrites another.
+                key = path.name
+                if key in license_files:
+                    key = path.as_posix()
+                license_files[key] = path.read_text(encoding="utf-8", errors="replace")
 
         if not license_files:
             continue
@@ -310,5 +322,5 @@ if __name__ == "__main__":
             third_party = apply_strip_licenses(third_party, strips)
 
     # Build license
-    html = build_license_html(project, third_party)
-    output_path.write_text(html, encoding="utf-8")
+    html_text = build_license_html(project, third_party)
+    output_path.write_text(html_text, encoding="utf-8")

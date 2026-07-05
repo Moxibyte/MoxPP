@@ -51,11 +51,25 @@ def WindowsBuild(conf):
         f'-p:Configuration={conf}'
     ))
 
+def DistributeDlls(conf):
+    # Distribute shared libraries into the build output directory.
+    # The premake pre/post-build hooks may not fire correctly in all
+    # Premake5 backends (e.g. xcode4), so we ensure distribution here as well.
+    arch_info = mox.GetThisPlatformInfo()
+    premake_arch = arch_info['premake_arch']
+    dlls_src = os.path.join('.', 'dlls', f'{conf}-{premake_arch}')
+    output_dir = os.path.join('.', 'build', f'{premake_arch}-{conf}', 'bin')
+    if os.path.isdir(dlls_src) and os.path.isdir(output_dir):
+        subprocess.run([sys.executable, './scripts/dist_dlls.py', dlls_src, output_dir], check=False)
+
 def LinuxBuild(conf):
     # Run the makefile
     subprocess.run((
         'make', f'config={conf.lower()}', 'all'
     ))
+
+    # Safety net in case the gmake postbuild hook did not fire
+    DistributeDlls(conf)
 
 def MacosBuild(conf):
     # Find workspace
@@ -83,15 +97,8 @@ def MacosBuild(conf):
             'build'
         ))
 
-    # Distribute dylibs into the build output directory.
-    # The xcode4 postbuild hook may not fire correctly in all Premake5 versions,
-    # so we ensure distribution happens here as well.
-    arch_info = mox.GetThisPlatformInfo()
-    premake_arch = arch_info['premake_arch']
-    dlls_src = os.path.join('.', 'dlls', f'{conf}-{premake_arch}')
-    output_dir = os.path.join('.', 'build', f'{premake_arch}-{conf}', 'bin')
-    if os.path.isdir(dlls_src) and os.path.isdir(output_dir):
-        subprocess.run([sys.executable, './scripts/dist_dlls.py', dlls_src, output_dir], check=False)
+    # Safety net in case the xcode4 postbuild hook did not fire
+    DistributeDlls(conf)
 
 if __name__ == '__main__':
     # Configuration from cli

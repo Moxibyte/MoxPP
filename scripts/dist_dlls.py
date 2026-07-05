@@ -52,8 +52,19 @@ if __name__ == "__main__":
     def _copy_file(src_file, dest_file):
         """Copy one file, preserving symlinks on POSIX."""
         dest_file.parent.mkdir(parents=True, exist_ok=True)
-        if dest_file.exists():
-            return
+        if dest_file.exists() or dest_file.is_symlink():
+            # Skip only when the destination is already up to date;
+            # otherwise remove it so a changed source file gets refreshed.
+            if (dest_file.is_file() and not dest_file.is_symlink() and not src_file.is_symlink()
+                    and file_hash(src_file) == file_hash(dest_file)):
+                return
+            try:
+                dest_file.unlink()
+            except OSError as e:
+                # E.g. the file is locked by a running process on Windows —
+                # keep going so the remaining files still get distributed.
+                print(f"Warning: could not replace {dest_file}: {e}")
+                return
         if os.name == "nt" or not src_file.is_symlink():
             shutil.copy2(src_file, dest_file)
             print(f"Copied {src_file} -> {dest_file}")

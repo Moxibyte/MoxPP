@@ -171,14 +171,14 @@ function mox_project(name, output_name)
             }
         filter {}
 
-        -- Post-build (always wired for every configuration; postbuild.py decides what to do)
+        -- Pre/post-build hooks (always wired for every configuration; prebuild.py / postbuild.py decide what to do)
         for idx,conf in pairs(cmox_configurations_n) do
             local is_debug = cmox_configurations_d[idx]
             -- When conan is release-only, debug configs still consume Release DLLs
             local effective_debug = is_debug and not hmox_conan_release_only
             filter { "configurations:" .. conf }
-                mox_runpy_postbuild(effective_debug)
                 mox_runpy_prebuild(effective_debug)
+                mox_runpy_postbuild(effective_debug)
             filter {}
         end
 
