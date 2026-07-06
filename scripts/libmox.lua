@@ -214,6 +214,14 @@ function mox_project(name, output_name)
                     "-Wl,-rpath,'$$ORIGIN'",
                 }
             filter {}
+
+            filter { "system:linux or unix" }
+                -- so searching next to the executable (DT_RPATH via --disable-new-dtags)
+                linkoptions {
+                    "-Wl,--disable-new-dtags",
+                    "-Wl,-rpath,'$$ORIGIN'",
+                }
+            filter {}
         end
 
         -- Fast compile
