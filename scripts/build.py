@@ -43,10 +43,10 @@ def WindowsBuild(conf):
     slnFiles = glob.glob('*.sln') + glob.glob('*.slnx')
     if len(slnFiles) == 0:
         print('No solution file found! Building not possible!')
-        return
+        sys.exit(1)
 
     # Run build
-    subprocess.run((
+    mox.RunChecked((
         msbuild, slnFiles[0],
         f'-p:Configuration={conf}'
     ))
@@ -55,16 +55,17 @@ def DistributeDlls(conf):
     # Distribute shared libraries into the build output directory.
     # The premake pre/post-build hooks may not fire correctly in all
     # Premake5 backends (e.g. xcode4), so we ensure distribution here as well.
-    arch_info = mox.GetThisPlatformInfo()
-    premake_arch = arch_info['premake_arch']
-    dlls_src = os.path.join('.', 'dlls', f'{conf}-{premake_arch}')
-    output_dir = os.path.join('.', 'build', f'{premake_arch}-{conf}', 'bin')
-    if os.path.isdir(dlls_src) and os.path.isdir(output_dir):
-        subprocess.run([sys.executable, './scripts/dist_dlls.py', dlls_src, output_dir], check=False)
+    # The target architecture is derived from the generated output folders
+    # because on cross builds it differs from the build machine architecture.
+    for output_dir in glob.glob(os.path.join('.', 'build', f'*-{conf}', 'bin')):
+        premake_arch = os.path.basename(os.path.dirname(output_dir)).rsplit(f'-{conf}', 1)[0]
+        dlls_src = os.path.join('.', 'dlls', f'{conf}-{premake_arch}')
+        if os.path.isdir(dlls_src):
+            subprocess.run([sys.executable, './scripts/dist_dlls.py', dlls_src, output_dir], check=False)
 
 def LinuxBuild(conf):
     # Run the makefile
-    subprocess.run((
+    mox.RunChecked((
         'make', f'config={conf.lower()}', 'all'
     ))
 
@@ -76,7 +77,7 @@ def MacosBuild(conf):
     workspace = glob.glob('*.xcworkspace')
     if len(workspace) == 0:
         print('No xcode workspace file found! Building not possible!')
-        return
+        sys.exit(1)
 
     # Find all schemes
     schemesCall = subprocess.check_output((
@@ -89,7 +90,7 @@ def MacosBuild(conf):
 
     # Build
     for scheme in schemes:
-        subprocess.run((
+        mox.RunChecked((
             'xcodebuild',
             '-workspace', workspace[0],
             '-scheme', scheme,
@@ -99,6 +100,13 @@ def MacosBuild(conf):
 
     # Safety net in case the xcode4 postbuild hook did not fire
     DistributeDlls(conf)
+
+def VerifyBuildArtifacts(conf):
+    # Guards against build tools that report success without producing output
+    artifacts = glob.glob(os.path.join('.', 'build', f'*-{conf}', 'bin', '*'))
+    if len(artifacts) == 0:
+        print(f'No build artifacts found in ./build/*-{conf}/bin/! The build did not produce any output!')
+        sys.exit(1)
 
 if __name__ == '__main__':
     # Configuration from cli
@@ -114,3 +122,6 @@ if __name__ == '__main__':
         MacosBuild(args.conf)
     else:
         LinuxBuild(args.conf)
+
+    # Make sure the build actually produced binaries
+    VerifyBuildArtifacts(args.conf)

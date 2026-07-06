@@ -23,6 +23,7 @@ SOFTWARE.
 """
 import os
 import re
+import sys
 import pathlib
 import platform
 import datetime
@@ -58,6 +59,13 @@ def GetPlatformInfo(arch):
     if not arch in MOX_ARCH_MAP:
         raise ValueError(f'Architecture "{arch}" is not supported by MoxPP!')
     return MOX_ARCH_MAP[arch]
+
+def RunChecked(cmd):
+    # Propagate tool failures to the caller (and CI) instead of ignoring them
+    returncode = subprocess.run(cmd).returncode
+    if returncode != 0:
+        print(f'Command failed with exit code {returncode}: {" ".join(cmd)}')
+        sys.exit(returncode)
 
 def GetFilename(product, version, system, conf, arch, extension):
     return f'{product}-{version}-{system}-{conf}-{arch}.{extension}' # project_name-1.0.0-Windows-Release-x86_64.zip

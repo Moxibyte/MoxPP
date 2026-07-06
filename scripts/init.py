@@ -33,7 +33,6 @@ import zipfile
 import tarfile
 import platform
 import argparse
-import subprocess
 import urllib.request
 
 DEFAULT_TO_CONAN_ALWAY_RELEASE = False
@@ -136,10 +135,10 @@ if __name__ == '__main__':
     # Generate conan project
     if not skipConan:
         if not conanReleaseOnly:
-            subprocess.run(ConanBuild('Debug', f'host_{arch}', 'build'))
-        subprocess.run(ConanBuild('Release', f'host_{arch}', 'build'))
+            mox.RunChecked(ConanBuild('Debug', f'host_{arch}', 'build'))
+        mox.RunChecked(ConanBuild('Release', f'host_{arch}', 'build'))
         # Copy conan dlls
-        subprocess.run((
+        mox.RunChecked((
             sys.executable,
             './scripts/copy_dlls.py',
             arch
@@ -153,7 +152,7 @@ if __name__ == '__main__':
     gccPrefix = hostArch[f'gcc_{ "linux" if sys.platform.startswith("linux") else "windows"  }_prefix'] + '-'
 
     # Generate external dependencies Lua
-    subprocess.run((
+    mox.RunChecked((
         sys.executable,
         './scripts/generate_moxpp_dependencies.py',
         '--arch', arch,
@@ -161,7 +160,7 @@ if __name__ == '__main__':
 
     # Run premake5
     premakeGenerator = GetPremakeGenerator(vsVersion)
-    subprocess.run((
+    mox.RunChecked((
         './dependencies/premake5/premake5',
         f'--mox_conan_arch={ hostArch["conan_arch"] }',
         f'--mox_premake_arch={ hostArch["premake_arch"] }',
@@ -174,7 +173,7 @@ if __name__ == '__main__':
 
     # Run license generator
     projectName = mox.ExtractLuaDef("./mox.lua", "cmox_product_name")
-    subprocess.run((
+    mox.RunChecked((
         sys.executable,
         "./scripts/generate_licenses.py",
         "--project-name", projectName,

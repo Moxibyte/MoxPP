@@ -57,61 +57,60 @@ VS_MSVC_MAPPINGS = {
 
 class INIProfileGen:
     def __init__(self, filename: str, architecture: str, os: str):
-        # Open file
-        self.file = open(filename, "w", encoding="utf-8")
-        # Begin conan profile section
-        self.StartSection("settings")
-        self.WritePair("arch", architecture)
+        self.filename = filename
+        # All pairs are buffered per section and only written out by Save().
+        # This allows Add* calls in any order and guarantees every section
+        # header appears exactly once (conan rejects duplicated sections).
+        self.sections = {}
+        # Base conan profile settings
+        self.SetPair("settings", "arch", architecture)
         if os != "Darwin":
-            self.WritePair("os", os)
+            self.SetPair("settings", "os", os)
         else:
-            self.WritePair("os", "Macos")
-        self.WritePair("build_type", "Release")
-
-    def __del__(self):
-        # Close file
-        if hasattr(self, "file") and not self.file.closed:
-            self.file.close()
+            self.SetPair("settings", "os", "Macos")
+        self.SetPair("settings", "build_type", "Release")
 
     def AddGcc(self, cppversion: str, gccversion: str, abiversion: str):
-        self.WritePair("compiler", "gcc")
-        self.WritePair("compiler.cppstd", cppversion)
-        self.WritePair("compiler.version", gccversion)
-        self.WritePair("compiler.libcxx", abiversion)
+        self.SetPair("settings", "compiler", "gcc")
+        self.SetPair("settings", "compiler.cppstd", cppversion)
+        self.SetPair("settings", "compiler.version", gccversion)
+        self.SetPair("settings", "compiler.libcxx", abiversion)
 
     def AddClang(self, cppversion: str, clangversion: str, abiversion: str):
-        self.WritePair("compiler", "clang")
-        self.WritePair("compiler.cppstd", cppversion)
-        self.WritePair("compiler.version", clangversion)
-        self.WritePair("compiler.libcxx", abiversion)
+        self.SetPair("settings", "compiler", "clang")
+        self.SetPair("settings", "compiler.cppstd", cppversion)
+        self.SetPair("settings", "compiler.version", clangversion)
+        self.SetPair("settings", "compiler.libcxx", abiversion)
 
     def AddMSVC(self, cppversion: str, msvcversion: str, runtime: str):
-        self.WritePair("compiler", "msvc")
-        self.WritePair("compiler.cppstd", cppversion)
-        self.WritePair("compiler.version", msvcversion)
-        self.WritePair("compiler.runtime", runtime)
+        self.SetPair("settings", "compiler", "msvc")
+        self.SetPair("settings", "compiler.cppstd", cppversion)
+        self.SetPair("settings", "compiler.version", msvcversion)
+        self.SetPair("settings", "compiler.runtime", runtime)
 
     def AddTempFolder(self, is_windows: bool, tempfolder: str):
-        self.StartSection("buildenv")
         if is_windows:
-            self.WritePair("TEMP", tempfolder)
-            self.WritePair("TMP", tempfolder)
+            self.SetPair("buildenv", "TEMP", tempfolder)
+            self.SetPair("buildenv", "TMP", tempfolder)
         else:
-            self.WritePair("TMPDIR", tempfolder)
-            self.WritePair("TEMP", tempfolder)
-            self.WritePair("TMP", tempfolder)
+            self.SetPair("buildenv", "TMPDIR", tempfolder)
+            self.SetPair("buildenv", "TEMP", tempfolder)
+            self.SetPair("buildenv", "TMP", tempfolder)
 
     def AddGccCrossLink(self, compilerprefix: str):
-        self.StartSection("buildenv")
-        self.WritePair("CC", f"{compilerprefix}-gcc")
-        self.WritePair("CXX", f"{compilerprefix}-g++")
-        self.WritePair("LD", f"{compilerprefix}-ld")
+        self.SetPair("buildenv", "CC", f"{compilerprefix}-gcc")
+        self.SetPair("buildenv", "CXX", f"{compilerprefix}-g++")
+        self.SetPair("buildenv", "LD", f"{compilerprefix}-ld")
 
-    def StartSection(self, section: str):
-        self.file.write(f"[{section}]\n")
+    def SetPair(self, section: str, key: str, value: str):
+        self.sections.setdefault(section, {})[key] = value
 
-    def WritePair(self, key: str, value: str):
-        self.file.write(f"{key}={value}\n")
+    def Save(self):
+        with open(self.filename, "w", encoding="utf-8") as file:
+            for section, pairs in self.sections.items():
+                file.write(f"[{section}]\n")
+                for key, value in pairs.items():
+                    file.write(f"{key}={value}\n")
 
 def ProfileGen(path: str, architecture: str, cppversion: str, tempfolder: str, vsVersion: str):
     is_windows = platform.system().lower() == "windows"
@@ -134,3 +133,4 @@ def ProfileGen(path: str, architecture: str, cppversion: str, tempfolder: str, v
         if architecture.lower() != platform.machine().lower():
             gen.AddGccCrossLink(platformInfo["gcc_linux_prefix"])
     gen.AddTempFolder(is_windows, tempfolder)
+    gen.Save()
