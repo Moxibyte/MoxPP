@@ -205,17 +205,9 @@ function mox_project(name, output_name)
                 }
             filter {}
             
-            filter { "system: not windows and not macosx" }
+            filter { "system:not windows", "system:not macosx" }
                 -- GCC Prefix
                 gccprefix (_OPTIONS["mox_gcc_prefix"])
-                -- so searching
-                linkoptions {
-                    "-Wl,--disable-new-dtags",
-                    "-Wl,-rpath,'$$ORIGIN'",
-                }
-            filter {}
-
-            filter { "system:linux or unix" }
                 -- so searching next to the executable (DT_RPATH via --disable-new-dtags)
                 linkoptions {
                     "-Wl,--disable-new-dtags",
