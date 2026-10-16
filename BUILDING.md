@@ -60,7 +60,7 @@ This project is designed to automatically set it's version macro and release all
 The project provides the following actions. You can run them with the mox tool (`mox` or `mox.bat` on Windows. `./mox.sh` on linux):
 - **init**: This command will initialized the repository. On windows it will generate a solution, on linux Makefiles. Will acquire all external libs via conan (Can be skipped to only run premake5). Usage: `./mox.bat/sh init --conf CONF --arch ARCH --skip_conan`.
 - **build**: This command will build the project. Usage: `./mox.bat/sh build --conf CONF`.
-- **deploy**: This command will deploy a build. Usage: `./mox.bat/sh deploy --conf CONF`.
+- **deploy**: This command will deploy a build (zip archives and, on Windows, an NSIS installer; a portable NSIS is bootstrapped into `./dependencies/nsis` on first use). Usage: `./mox.bat/sh deploy --conf CONF`.
 - **clean**: This command will remove all regenerateable files of a certain category. Usage `./mox.bat/sh clean [type]` Where type can be (`output`, `project`, `dependencies`, or `all`. Defaults to `output`).
 - **archive**: This command will call git archive to generate a archive file of all committed changes into a dedicated ignored folder with timestamp. Usage `./mox.bat/sh archive` (no arguments supported).
 - **run**: This will automatically run a specific executable in the correct working dir. Usage `./mox.bat/sh run [--conf Debug/Release/...] EXE [args...]`.

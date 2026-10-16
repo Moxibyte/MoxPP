@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # TODO: Add your own implementation
     #       We do some quick example here
 
-    # Simple zip archive with the software (dumb copy)
+    # == Simple zip archive with the software (dumb copy) ==
     # Also add the msvc redists via "AddMSVCRedists" call (does nothing is not on windows!)
     zipArchive = mox.MDZip(mox.AutomaticFilename(f"{appName}", version, args.conf, args.arch, "zip"))
     zipArchive.AddFolder(f'{build_folder}/bin', '')
@@ -55,6 +55,37 @@ if __name__ == '__main__':
     # zipArchive.AddMSVCRedists() <-- Add this when you want to distribute redists. REMARK: This will include latest redists (most recent install visual studio). Please make sure you check licensing
     zipArchive.Deploy()
 
-    # Source archive
+    # == Windows installer (NSIS, Modern UI 2). Deploy() is skipped with a warning on non windows systems. ==
+    # The first call bootstraps a portable NSIS into ./dependencies/nsis (plus plug-ins when needed).
+    # All Set* calls are optional, see scripts/mox/mdnsis.py for the full API.
+    installer = mox.MDNSIS(mox.AutomaticFilename(f"{appName}", version, args.conf, args.arch, "exe"), appName, version, args.arch)
+    installer.SetMeta(publisher="Moxibyte GmbH", description=f"{appName} Installer", url="https://github.com/moxibyte/MoxPP") # <-- Adjust to your product
+    installer.SetMainExecutable("hello_world.exe")           # Used for the display icon and run after install
+    installer.SetLicense("./LICENSE.html")                   # .html is rendered via the EmbedHTML plug-in (.txt/.rtf also supported)
+    installer.SetReadme(text=f"Thank you for installing {appName} {version}.\n\nThis is a free text information page shown before the installation starts.")
+    installer.SetInstallScopes(("machine", "user"))          # Both supported -> the end user chooses inside the installer
+    installer.SetRunAfterInstall(True)                       # "Run hello_world" checkbox on the finish page
+    # installer.SetLanguages(("English", "German"))          # More than one language shows a language selection dialog
+    # installer.SetIcons("./res/install.ico", "./res/uninstall.ico")
+    # installer.SetTheme(headerImage="./res/header.bmp", welcomeImage="./res/welcome.bmp")
+
+    # Components: files, shortcuts and actions bind to the most recent StartComponent() call.
+    # "Group/Leaf" paths create section groups. The components page is only shown when an optional component exists.
+    installer.StartComponent("Application", required=True, description="Core application files")
+    installer.AddFolder(f'{build_folder}/bin', '')
+    installer.AddFile("./LICENSE.html", "LICENSE.html")
+    # installer.AddMSVCRedists()                                        # Installs the redist silently. See licensing remark above
+    # installer.AddPostInstallAction("hello_world.exe", "--first-run")  # Runs hidden after the files, output in the install log
+    # installer.AddPreUninstallAction("hello_world.exe", "--cleanup")   # Runs before the uninstaller removes files
+
+    installer.StartComponent("Shortcuts/Start Menu", description="Start menu entries")
+    installer.AddShortcut("hello_world.exe", appName, "startmenu")
+    installer.AddShortcut("Uninstall.exe", f"Uninstall {appName}", "startmenu")
+
+    installer.StartComponent("Shortcuts/Desktop", default=False, description="Desktop shortcut")
+    installer.AddShortcut("hello_world.exe", appName, "desktop")
+    installer.Deploy()
+
+    # == Source archive ==
     srcArchive = mox.MDSrc(mox.AutomaticFilename(f"{appName}_src", version, args.conf, args.arch, "zip"))
     srcArchive.Deploy()

@@ -31,6 +31,7 @@ class MDSrc:
         self.__path =  deployDir + "/" + filename
 
     def Deploy(self):
+        print(f'Building source archive {self.__path} ...')
         subprocess.run((
             'git', 'archive',
             '--format=zip',

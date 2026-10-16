@@ -56,6 +56,7 @@ class MDZip:
                 print('ERROR: Failed to find msvc redist installer!')
 
     def Deploy(self):
+        print(f'Building zip archive {self.__path} ...')
         with zipfile.ZipFile(self.__path, 'w') as zip_file:
             for file in self.__files:
                 zip_file.write(file[0], file[1])

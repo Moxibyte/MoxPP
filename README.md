@@ -3,6 +3,22 @@ C++ Template Repository with Conan2 and Premake5 for Windows, Linux and MacOS. O
 
 **Please make sure to read the WHOLE readme and follow all instructions!**
 
+## Features
+- **Cross platform build system**: Premake5 generates Visual Studio solutions (2017 to 2026), GNU Makefiles and Xcode projects. Windows `x86`/`x86_64`/`ARM64`, Linux `x86`/`x86_64`/`ARM`/`ARM64`, macOS `ARM64`. Cross compiling for a different architecture of the same OS via `--arch`.
+- **One command workflow**: `mox init`, `build`, `run`, `test`, `clean`, `deploy`, `autogen`, `graph`, `archive`, `generate_uuid`, `generate_licenses`, `generate_moxpp_dependencies`. The launcher scripts (`mox.bat` / `mox.sh`) create a Python venv with all tooling on first use. Custom actions are just new Python files in `./scripts`.
+- **Conan 2 package management**: Dependencies declared in `conanfile.py`, Conan profiles are generated automatically for the build and host architecture. Runtime DLLs are collected into `./dlls` and distributed to the output folder after each build.
+- **Simple project description**: One `mox.lua` for the workspace and one small `build.lua` per project (`mox_project`, `mox_cpp`, `mox_console`, `mox_sharedlib`, ...). Four project layouts: `single`, `flat`, `hierarchical` and `manual`. Full Premake5 API available afterwards.
+- **Auto generated preprocessor macros**: Version, workspace and project roots, configuration, OS, architecture, bitness and project kind are exposed to the code (`MOXPP_VERSION`, `MOXPP_OS_WINDOWS`, `MOXPP_ARCH_X86_64`, ...).
+- **Pre and post build hooks**: `scripts/prebuild.py` and `scripts/postbuild.py` run for every project with full context (name, path, configuration, architecture, kind).
+- **External (non Conan) dependencies**: `dependencies.yml` downloads and extracts archives, runs build scripts, copies DLLs and asset folders and wires include and library paths into the projects.
+- **Unit testing**: gtest based `unittest` project that links against every library marked with `mox_test_requirement()`. `mox test` runs init, build and the tests. Can be disabled or swapped.
+- **License compliance report**: `./LICENSE.html` is generated from your license and all Conan dependency licenses. Additional licenses and stripping rules via `licenses.yml`.
+- **Deployment**: `mox deploy` creates a binary zip (`mox.MDZip`, optional MSVC redists), a source archive (`mox.MDSrc`) and on Windows a NSIS installer (`mox.MDNSIS`): Modern UI 2, per machine or per user installation, hierarchical components, shortcuts, custom install and uninstall actions, free text information page, HTML license page, multiple languages, custom icons and theming and always an uninstaller. A portable NSIS is bootstrapped automatically into `./dependencies/nsis`.
+- **Versioning**: The version is taken from the `MOXPP_VERSION` environment variable (set to the tag name by the release workflow) and embedded into binaries, archives and installer.
+- **GitHub Actions**: Workflows for build, test and release deployment on Windows, Linux and macOS, uploading all deploy artifacts to the GitHub release.
+- **Conan dependency graph**: `mox graph` renders the dependency graph to a HTML file.
+- **Claude Code integration**: `CLAUDE.md` with build system context and the skills `/moxpp-setup`, `/moxpp-add-project` and `/moxpp-check`.
+
 ## Important things to know
 - This project support cross compiling but only for the same os. I only tested `x86_64` to `arm64` (because this is the most likely usage of cross compiling. The binaries work on `arm64` chips like RPi CMs, iMX91/3)
 - The project support `x86`, `x86_64`, `ARM` and `ARM64` (Compiling from windows and linux for the respective systems has been test. Only plain `ARM` is not tests. However we do not unit-test any configuration other than 64bit).

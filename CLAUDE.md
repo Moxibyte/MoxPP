@@ -26,7 +26,7 @@ Common actions:
 | `run` | Execute a compiled binary |
 | `test` | Run unit tests (init → build → run unittest) |
 | `clean` | Remove generated files (`output`, `project`, `dependencies`, `all`) |
-| `deploy` | Package binaries and sources into ZIPs |
+| `deploy` | Package binaries and sources into ZIPs and (Windows only) build an NSIS installer |
 | `autogen` | Full pipeline: init → build → deploy |
 | `generate_uuid` | Print a new UUID for use in a build.lua |
 | `generate_licenses` | Create an HTML license compliance report (`./LICENSE.html`) |
@@ -217,6 +217,22 @@ strip_licenses:
 `strip_licenses` removes individual license files from a lib's report entry. If all files for a lib are stripped it is dropped from the report entirely.
 
 Output is written to `./LICENSE.html`.
+
+### Deploy: `scripts/deploy.py`
+
+`mox deploy` runs `scripts/deploy.py`, which uses the deploy classes from `scripts/mox/`:
+
+| Class | Output |
+|-------|--------|
+| `mox.MDZip(filename)` | Plain zip. `AddFile(src, name)`, `AddFolder(folder, name)`, `AddMSVCRedists()`, `Deploy()` |
+| `mox.MDSrc(filename)` | Source zip via `git archive`. `Deploy()` |
+| `mox.MDNSIS(filename, appName, version, arch)` | NSIS installer (Modern UI 2, MultiUser, always with uninstaller). Same `AddFile`/`AddFolder`/`AddMSVCRedists` API as `MDZip`. |
+
+`MDNSIS` optional configuration (all `Set*` calls are optional): `SetMeta(publisher, description, url, copyright, installFolderName)`, `SetMainExecutable("app.exe")` (display icon, run after install), `SetReadme(text=...)` (free-text info page shown before install), `SetLicense(file)` (`.html` rendered via the EmbedHTML plug-in, `.txt`/`.rtf` native), `SetInstallScopes(("machine","user"))` (both → end user chooses), `SetRunAfterInstall()`, `SetLanguages(("English","German"))`, `SetIcons(install, uninstall)`, `SetTheme(headerImage, welcomeImage, ...)`, `SetStrings(language, readmeTitle=..., readmeSubtitle=...)`.
+
+`MDNSIS` components: `StartComponent("Group/Leaf", required=False, default=True, description=None)` starts a component; every following `AddFile`/`AddFolder`/`AddMSVCRedists`/`AddShortcut(target, name, location="startmenu"|"desktop", args, icon)`/`AddPostInstallAction(exe, args, visible=False)`/`AddPreUninstallAction(exe, args, visible=False)` binds to it. `/` in the path creates NSIS section groups, required components are read-only, `default=False` starts unchecked. Content added before any `StartComponent` goes into a hidden always-installed section. The components page appears only when an optional component exists. Hidden actions run via `nsExec::ExecToLog` (output in the install log), visible ones via `ExecWait`; pre-uninstall actions are skipped when their executable is missing.
+
+`MDNSIS.Deploy()` is skipped with a warning on non-Windows systems. On Windows it bootstraps a portable NSIS (version in `NSIS_VERSION`) into `./dependencies/nsis` when missing, downloads plug-ins on demand (`NSIS_PLUGINS`), writes the generated script to `./build/nsis/<name>/installer.nsi` and compiles it with `makensis`. Filenames come from `mox.AutomaticFilename(product, version, conf, arch, ext)`.
 
 ### Build Output Layout
 
