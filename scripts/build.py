@@ -51,6 +51,9 @@ def WindowsBuild(conf):
         f'-p:Configuration={conf}'
     ))
 
+    # Safety net in case the msbuild postbuild event did not fire
+    DistributeDlls(conf)
+
 def DistributeDlls(conf):
     # Distribute shared libraries into the build output directory.
     # The premake pre/post-build hooks may not fire correctly in all

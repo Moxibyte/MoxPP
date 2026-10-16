@@ -37,6 +37,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+import os
+import sys
 import argparse
 
 if __name__ == '__main__':
@@ -58,7 +60,15 @@ if __name__ == '__main__':
     # Strip any trailing slashes so path joining works cleanly on all platforms
     output_path = args.output_path.rstrip('/\\')
 
-    print(f"[prebuild] {args.project_name}: kind={args.project_kind!r} arch={args.project_architecture!r} conf={args.project_configuration!r} is_debug={is_debug}", flush=True)
+    # The launcher (mox.bat / mox.sh) runs this hook from the repo root, so relative paths
+    # from the build system would resolve against the wrong directory. libmox.lua emits
+    # absolute paths ("!" token prefix); fail loudly instead of silently working elsewhere.
+    for label, value in (('--project_path', args.project_path), ('--output_path', output_path)):
+        if not os.path.isabs(value):
+            print(f'[prebuild] {args.project_name}: {label} "{value}" is not absolute! Regenerate the project files with "mox init".')
+            sys.exit(1)
+
+    print(f"[prebuild]{args.project_name}: kind={args.project_kind!r} arch={args.project_architecture!r} conf={args.project_configuration!r} is_debug={is_debug}", flush=True)
 
     # -------------------------------------------------------------------------
     # Add your own pre-build logic below.

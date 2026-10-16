@@ -320,11 +320,15 @@ end
 -- Internal functions
 -- path.translate(..., "/") ensures forward-slash separators so a trailing slash never
 -- produces the cmd.exe \" escaping bug (e.g. "C:\path\" eats the closing quote).
+-- The "!" token prefix stops premake from making the absolute paths relative to the
+-- project directory. mox.bat / mox.sh change into the repo root before running the
+-- hooks, so relative paths would resolve against the wrong directory (DLLs ended up
+-- next to the repository instead of inside build/<arch>-<conf>/bin).
 function mox_runpy_postbuild(is_debug)
     local flag = is_debug and "true" or "false"
     postbuildcommands {
         mox_cli_mox_command(
-            'postbuild --project_name "%{prj.name}" --project_path "%{path.translate(prj.location, "/")}" --output_path "%{path.translate(cfg.targetdir, "/")}" --project_configuration "%{cfg.buildcfg}" --is_debug ' .. flag .. ' --project_architecture "%{cfg.architecture}" --project_kind "%{cfg.kind}"'
+            'postbuild --project_name "%{prj.name}" --project_path "%{!path.translate(prj.location, "/")}" --output_path "%{!path.translate(cfg.targetdir, "/")}" --project_configuration "%{cfg.buildcfg}" --is_debug ' .. flag .. ' --project_architecture "%{cfg.architecture}" --project_kind "%{cfg.kind}"'
         )
     }
 end
@@ -332,7 +336,7 @@ function mox_runpy_prebuild(is_debug)
     local flag = is_debug and "true" or "false"
     prebuildcommands {
         mox_cli_mox_command(
-            'prebuild --project_name "%{prj.name}" --project_path "%{path.translate(prj.location, "/")}" --output_path "%{path.translate(cfg.targetdir, "/")}" --project_configuration "%{cfg.buildcfg}" --is_debug ' .. flag .. ' --project_architecture "%{cfg.architecture}" --project_kind "%{cfg.kind}"'
+            'prebuild --project_name "%{prj.name}" --project_path "%{!path.translate(prj.location, "/")}" --output_path "%{!path.translate(cfg.targetdir, "/")}" --project_configuration "%{cfg.buildcfg}" --is_debug ' .. flag .. ' --project_architecture "%{cfg.architecture}" --project_kind "%{cfg.kind}"'
         )
     }
 end

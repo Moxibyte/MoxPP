@@ -69,7 +69,15 @@ if __name__ == '__main__':
     # Strip any trailing slashes so path joining works cleanly on all platforms
     output_path = args.output_path.rstrip('/\\')
 
-    print(f"[postbuild] {args.project_name}: kind={args.project_kind!r} arch={args.project_architecture!r} conf={args.project_configuration!r} is_debug={is_debug}", flush=True)
+    # The launcher (mox.bat / mox.sh) runs this hook from the repo root, so relative paths
+    # from the build system would resolve against the wrong directory (DLLs were copied next
+    # to the repository). libmox.lua emits absolute paths ("!" token prefix); fail loudly.
+    for label, value in (('--project_path', args.project_path), ('--output_path', output_path)):
+        if not os.path.isabs(value):
+            print(f'[postbuild] {args.project_name}: {label} "{value}" is not absolute! Regenerate the project files with "mox init".')
+            sys.exit(1)
+
+    print(f"[postbuild]{args.project_name}: kind={args.project_kind!r} arch={args.project_architecture!r} conf={args.project_configuration!r} is_debug={is_debug}", flush=True)
 
     # -------------------------------------------------------------------------
     # DLL distribution – copy DLLs from ./dlls/<Conf>-<arch>/ into output_path.
