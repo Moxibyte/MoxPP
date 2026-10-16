@@ -86,6 +86,21 @@ if __name__ == '__main__':
     installer.AddShortcut("hello_world.exe", appName, "desktop")
     installer.Deploy()
 
+    # == Debian package (dpkg-deb). Deploy() is skipped when dpkg-deb is not available (windows / macos / non debian) ==
+    # Destinations are absolute linux install paths. Symlinks (e.g. shared lib chains) are preserved.
+    debName = appName.lower()
+    package = mox.MDDPkg(mox.AutomaticFilename(f"{appName}", version, args.conf, args.arch, "deb"), debName, version, args.arch)
+    package.SetMeta(maintainer="Moxibyte GmbH <sales@moxibyte.com>", description=f"{appName} example application", section="utils", priority="optional", homepage="https://github.com/moxibyte/MoxPP") # <-- Adjust to your product
+    package.AddFolder(f'{build_folder}/bin', f'opt/{debName}')                   # Binaries and shared libs stay together (no rpath needed)
+    package.AddSymlink(f'usr/bin/hello_world', f'/opt/{debName}/hello_world')
+    package.AddFile("./LICENSE.html", f'usr/share/doc/{debName}/LICENSE.html')
+    package.AddDependency("libc6")                                                # package.AddDependency("libssl3", ">= 3.0")
+    package.AppendPostInstall(f'echo "{appName} {version} installed"')           # Every Append* call adds lines to the respective maintainer script
+    # package.AppendPostInstall(f'setcap CAP_NET_BIND_SERVICE=+eip /opt/{debName}/hello_world')
+    package.AppendPreRemove(f'echo "Removing {appName}"')
+    package.AppendPostRemove(f'echo "Removed {appName}"')
+    package.Deploy()
+
     # == Source archive ==
     srcArchive = mox.MDSrc(mox.AutomaticFilename(f"{appName}_src", version, args.conf, args.arch, "zip"))
     srcArchive.Deploy()

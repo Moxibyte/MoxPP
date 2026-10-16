@@ -51,6 +51,20 @@ MOX_ARCH_MAP = {
     "aarch64_be":   { "conan_arch": "armv8",    "premake_arch": "ARM64",    "gcc_linux_prefix": "aarch64_be-linux-gnu",     "gcc_windows_prefix": "" },                     # Seen on linux
 }
 
+# Semantic version (semver.org regex) adapted for an unanchored search:
+# - (?<!\d) / (?![0-9a-zA-Z-]) act as boundaries so "01.1.1", "1.1.01" and "1.2.3-0123" are rejected
+#   instead of being truncated to a wrong but valid looking version
+# - the alphanumeric identifier alternative comes first so "1.0.0-0A.is.legal" is not cut after "0"
+# - re.ASCII keeps \d to 0-9
+SEMVER_REGEX = re.compile(
+    r'(?<!\d)'
+    r'(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)'
+    r'(?:-(?P<prerelease>(?:\d*[a-zA-Z-][0-9a-zA-Z-]*|0|[1-9]\d*)(?:\.(?:\d*[a-zA-Z-][0-9a-zA-Z-]*|0|[1-9]\d*))*))?'
+    r'(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?'
+    r'(?![0-9a-zA-Z-])',
+    re.ASCII
+)
+
 def GetThisPlatformInfo():
     return GetPlatformInfo(platform.machine())
 
@@ -74,12 +88,17 @@ def AutomaticFilename(product, version, conf, arch, extension):
     return GetFilename(product, version, platform.system(), conf, GetPlatformInfo(arch)["premake_arch"], extension)
 
 def GetAppVersion(default=""):
+    date = datetime.datetime.now().strftime('%Y%m%d')
     version = os.environ.get("MOXPP_VERSION")
     if version is None:
         if len(default) > 0:
             return default
-        return f"0.0.0+dev.{ datetime.datetime.now().strftime('%Y%m%d') }"
-    return version
+        return f"0.0.0+dev.{date}"
+    match = SEMVER_REGEX.search(version)
+    if match is None:
+        print(f'Warning: MOXPP_VERSION "{version}" contains no semantic version, using 0.0.0+cci.{date}')
+        return f"0.0.0+cci.{date}"
+    return match.group(0)
 
 def ExtractLuaDef(filepath, variable):
     text = pathlib.Path(filepath).read_text(encoding="utf-8")

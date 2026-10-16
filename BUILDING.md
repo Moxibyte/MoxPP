@@ -54,13 +54,13 @@ To create the xcode projects run the following command in the root of the reposi
 After setting up the project, you will find a `.xcworkspace` folder in the root directory. Open this folder with xcode or via finder.
 
 ## Releases
-This project is designed to automatically set it's version macro and release all artifacts. This happens via GitHub actions (if not deleted) or via a manual `mox deploy` call. The call expects a environment variable `MOXPP_VERSION` to be set to the current version string (Will be automatically the tag name of the github release when using actions). The deploy process can be seen in `/scripts/deploy.py`.
+This project is designed to automatically set it's version macro and release all artifacts. This happens via GitHub actions (if not deleted) or via a manual `mox deploy` call. The call expects a environment variable `MOXPP_VERSION` to be set to the current version string (Will be automatically the tag name of the github release when using actions). The first semantic version found inside the variable is used (`v1.2.3` becomes `1.2.3`); if none is found `0.0.0+cci.<date>` is used, without the variable `0.0.0+dev.<date>`. All scripts obtain the version via `mox.GetAppVersion()`. The deploy process can be seen in `/scripts/deploy.py`.
 
 ## Actions
 The project provides the following actions. You can run them with the mox tool (`mox` or `mox.bat` on Windows. `./mox.sh` on linux):
 - **init**: This command will initialized the repository. On windows it will generate a solution, on linux Makefiles. Will acquire all external libs via conan (Can be skipped to only run premake5). Usage: `./mox.bat/sh init --conf CONF --arch ARCH --skip_conan`.
 - **build**: This command will build the project. Usage: `./mox.bat/sh build --conf CONF`.
-- **deploy**: This command will deploy a build (zip archives and, on Windows, an NSIS installer; a portable NSIS is bootstrapped into `./dependencies/nsis` on first use). Usage: `./mox.bat/sh deploy --conf CONF`.
+- **deploy**: This command will deploy a build (zip archives, on Windows an NSIS installer with a portable NSIS bootstrapped into `./dependencies/nsis` on first use, on Debian based Linux a `.deb` package via `dpkg-deb`). Usage: `./mox.bat/sh deploy --conf CONF`.
 - **clean**: This command will remove all regenerateable files of a certain category. Usage `./mox.bat/sh clean [type]` Where type can be (`output`, `project`, `dependencies`, or `all`. Defaults to `output`).
 - **archive**: This command will call git archive to generate a archive file of all committed changes into a dedicated ignored folder with timestamp. Usage `./mox.bat/sh archive` (no arguments supported).
 - **run**: This will automatically run a specific executable in the correct working dir. Usage `./mox.bat/sh run [--conf Debug/Release/...] EXE [args...]`.

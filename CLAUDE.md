@@ -128,7 +128,7 @@ Every project gets these macros (prefix = `cmox_macro_prefix`):
 
 | Macro | Value |
 |-------|-------|
-| `PREFIX_VERSION` | Version string (from `MOXPP_VERSION` env var or dev timestamp) |
+| `PREFIX_VERSION` | Version string via `mox.GetAppVersion()`: first semver inside `MOXPP_VERSION` (`v1.2.3` → `1.2.3`), `0.0.0+cci.<date>` if no semver found, `0.0.0+dev.<date>` without the variable |
 | `PREFIX_WORKSPACE_ROOT` | Absolute path to the repo root |
 | `PREFIX_PROJECT_ROOT` | Absolute path to this project's directory |
 | `PREFIX_DEBUG` / `PREFIX_NDEBUG` | Set per configuration |
@@ -227,10 +227,13 @@ Output is written to `./LICENSE.html`.
 | `mox.MDZip(filename)` | Plain zip. `AddFile(src, name)`, `AddFolder(folder, name)`, `AddMSVCRedists()`, `Deploy()` |
 | `mox.MDSrc(filename)` | Source zip via `git archive`. `Deploy()` |
 | `mox.MDNSIS(filename, appName, version, arch)` | NSIS installer (Modern UI 2, MultiUser, always with uninstaller). Same `AddFile`/`AddFolder`/`AddMSVCRedists` API as `MDZip`. |
+| `mox.MDDPkg(filename, packageName, version, arch)` | Debian package via `dpkg-deb` (Linux with dpkg only, skipped elsewhere). `AddFile(src, dest, mode)`, `AddFolder(folder, dest, mode)` (destinations are absolute install paths, symlinks preserved), `AddSymlink(link, target)`. |
 
 `MDNSIS` optional configuration (all `Set*` calls are optional): `SetMeta(publisher, description, url, copyright, installFolderName)`, `SetMainExecutable("app.exe")` (display icon, run after install), `SetReadme(text=...)` (free-text info page shown before install), `SetLicense(file)` (`.html` rendered via the EmbedHTML plug-in, `.txt`/`.rtf` native), `SetInstallScopes(("machine","user"))` (both → end user chooses), `SetRunAfterInstall()`, `SetLanguages(("English","German"))`, `SetIcons(install, uninstall)`, `SetTheme(headerImage, welcomeImage, ...)`, `SetStrings(language, readmeTitle=..., readmeSubtitle=...)`.
 
 `MDNSIS` components: `StartComponent("Group/Leaf", required=False, default=True, description=None)` starts a component; every following `AddFile`/`AddFolder`/`AddMSVCRedists`/`AddShortcut(target, name, location="startmenu"|"desktop", args, icon)`/`AddPostInstallAction(exe, args, visible=False)`/`AddPreUninstallAction(exe, args, visible=False)` binds to it. `/` in the path creates NSIS section groups, required components are read-only, `default=False` starts unchecked. Content added before any `StartComponent` goes into a hidden always-installed section. The components page appears only when an optional component exists. Hidden actions run via `nsExec::ExecToLog` (output in the install log), visible ones via `ExecWait`; pre-uninstall actions are skipped when their executable is missing.
+
+`MDDPkg` configuration: `SetMeta(maintainer, description, section, priority, homepage, longDescription)` (maintainer and description are required by dpkg), `AddDependency(package, version=None, kind="depends"|"pre-depends"|"recommends"|"suggests"|"conflicts"|"breaks"|"replaces"|"provides")`, `SetControlField(field, value)`, maintainer scripts via appending calls `AppendPreInstall(lines)`, `AppendPostInstall(lines)`, `AppendPreRemove(lines)`, `AppendPostRemove(lines)` (generic `AppendScript(name, lines)`; scripts get `#!/bin/bash` + `set -e` and mode `SetScriptMode(0o755)`). `Deploy()` stages into `./build/dpkg/<name>/`, computes `Installed-Size`, writes `md5sums` and `conffiles` (files under `etc/`) and runs `dpkg-deb --build --root-owner-group`.
 
 `MDNSIS.Deploy()` is skipped with a warning on non-Windows systems. On Windows it bootstraps a portable NSIS (version in `NSIS_VERSION`) into `./dependencies/nsis` when missing, downloads plug-ins on demand (`NSIS_PLUGINS`), writes the generated script to `./build/nsis/<name>/installer.nsi` and compiles it with `makensis`. Filenames come from `mox.AutomaticFilename(product, version, conf, arch, ext)`.
 
