@@ -65,7 +65,7 @@ def GetPremakeDownloadUrl(version):
     else:
         return baseUrl + 'linux.tar.gz'
 
-def DownloadPremake(version = '5.0.0-beta8'):
+def DownloadPremake(version = '5.0.0'):
     premakeDownloadUrl = GetPremakeDownloadUrl(version)
     premakeTargetFolder = './dependencies/premake5'
     premakeTargetZip = f'{premakeTargetFolder}/premake5.tmp'
